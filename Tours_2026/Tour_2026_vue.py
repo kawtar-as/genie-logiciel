@@ -1,6 +1,7 @@
 # -*- coding: ISO-8859-1 -*-
 from tkinter import *
 import tkinter as tk
+from PIL import Image, ImageTk
 
 
 class Vue():
@@ -24,12 +25,14 @@ class Vue():
 
 
     def creer_carte(self):
-        self.canevas = tk.Canvas(self.frame_principale, width=500, height=500, bg="yellow")
+        self.canevas = tk.Canvas(self.frame_principale, width=500, height=500)
         self.canevas.grid(row=0, column=0)
         
         self.canevas.bind("<Button-1>", self.getPosTour)
         ##self.canevas.pack()
-
+        self.chemin1 = Image.open("Tours_2026/chemin1.png")
+        self.resize = self.chemin1.resize((500, 500), Image.Resampling.LANCZOS)
+        self.chmin_img = ImageTk.PhotoImage(self.resize)
 
 
     def creer_boite_menu(self):
@@ -47,14 +50,14 @@ class Vue():
         self.parent.setTour([x, y])
 
     def afficheModele(self):
+        self.canevas.delete("all")
 
-
+        self.canevas.create_image(0, 0, image=self.chmin_img, anchor=tk.NW)
         pos = []
         # On assume que nivoActif est initialis� au moment de l'affichage
         for i in self.parent.modele.nivoActif.parcours.noeuds:
             pos.append(i[0] * 5)
             pos.append(i[1] * 5)
-        self.canevas.delete("all")
         self.canevas.create_line(pos, width=2, fill="black", tags=("chemin",))
 
     def afficheCreepTourBombe(self):
