@@ -27,6 +27,9 @@ class Controleur():
             self.vue.afficheCreepTourBombe()
             # Appel r�cursif via Tkinter
             self.vue.root.after(self.delai, self.continuePartie)
+            #SI VIE JOUEUR == 0 alors partie termine
+            if self.modele.vie == 0:
+                self.actif = 0
 
     def setTour(self, pos):
         self.modele.setTour(pos)
