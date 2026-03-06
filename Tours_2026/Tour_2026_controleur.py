@@ -14,6 +14,8 @@ class Controleur():
         if self.actif == 0:
             self.actif = 1
             self.modele.demarrePartie()
+            self.vue.creer_boite_menu()
+            
             self.vue.afficheModele()
             self.continuePartie()
         else:
@@ -23,7 +25,7 @@ class Controleur():
         if self.actif:
             self.modele.nivoActif.bougeCreep()
             self.vue.afficheCreepTourBombe()
-            # Appel récursif via Tkinter
+            # Appel rï¿½cursif via Tkinter
             self.vue.root.after(self.delai, self.continuePartie)
 
     def setTour(self, pos):
