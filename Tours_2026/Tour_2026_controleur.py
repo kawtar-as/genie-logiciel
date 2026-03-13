@@ -24,6 +24,7 @@ class Controleur():
     def continuePartie(self):
         if self.actif:
             self.modele.nivoActif.bougeCreep()
+            self.modele.nivoActif.creepDansRadio()
             self.vue.afficheCreepTourBombe()
             # Appel r�cursif via Tkinter
             self.vue.root.after(self.delai, self.continuePartie)

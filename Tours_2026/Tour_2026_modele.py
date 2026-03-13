@@ -51,13 +51,21 @@ class Tour():
         self.pos_y = pos_y
         self.cible = [0,0]
         self.vitesse_tir = 5
-        self.rayon = 5
+        self.rayon = 3
         self.projectile = []
         self.prix = 100
         self.force = 1
+
+    def getPosition(self):
+        return self.pos_x, self.pos_y
+
     def tirer(self, rayon, cible):
         self.rayon = rayon
         self.cible = cible
+        for creep in self.parent.Nivo.creepsEncours:
+            if (creep):
+                self.projectile.append(Missile, cible[0], cible[1], 10, 10 )
+
 
 
 
@@ -125,6 +133,9 @@ class Creep():
         self.parent.parent.vie -= valeur
         print(self.parent.parent.vie)
 
+    def getPosition(self):
+        return self.pos[0], self.pos[1]
+
         
 class Nivo(): ##Vague
     def __init__(self,parent):
@@ -170,6 +181,19 @@ class Nivo(): ##Vague
     def setTour(self,pos_x,pos_y):
         print("NIVO",pos_x,pos_y)
         self.tours.append(Tour(self,pos_x,pos_y))
+
+    def creepDansRadio(self):
+        for tour in self.tours:
+            xTour, yTour = tour.getPosition()
+            for creep in self.creepsEnCours:
+                xCreep, yCreep = creep.getPosition()
+                if (self.diference(xTour, xCreep) <= tour.rayon and self.diference(yCreep, yTour)):
+                    print("creep dans le rayon")
+                    return True
+                    
+
+    def diference(self, n1, n2):
+        return abs(n1)-abs(n2)
         
 class Modele():
     def __init__(self, parent):
@@ -183,9 +207,13 @@ class Modele():
     def demarrePartie(self):
         self.nivo=self.nivo+1
         self.nivoActif=Nivo(self)
+
     def setTour(self,pos_x,pos_y):
         print("MODELE",pos_x,pos_y)
         self.nivoActif.setTour(pos_x,pos_y)
+
+
+
 
 if __name__ == '__main__':
     m=Modele(1)
