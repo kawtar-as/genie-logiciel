@@ -20,7 +20,7 @@ class Parcours():
                      [50,80],
                      [100,80]]
         
-        self.noeuds2=[[0,10],
+        self.noeuds2=[[0,0],
                      [20,10],
                      [20,40],
                      [50,40],
@@ -30,15 +30,15 @@ class Parcours():
                      [30,60],
                      [30,80],
                      [100,80]]
-        self.noeuds = [[0, 10],
-                       [20, 40],
-                       [50, 40],
-                       [50, 20],
-                       [80, 20],
-                       [80, 60],
-                       [30, 60],
-                       [30, 80],
-                       [100, 80]]
+        self.noeuds = [[0, 0],
+                       [22, 35],
+                       [53, 35],
+                       [53, 23],
+                       [75, 23],
+                       [75, 55],
+                       [33, 55],
+                       [33, 77],
+                       [100, 77]]
         
         self.place_tour =[[20, 40],
                           [20, 60],
@@ -51,7 +51,7 @@ class Tour():
         self.pos_y = pos_y
         self.cible = [0,0]
         self.vitesse_tir = 5
-        self.rayon = 0
+        self.rayon = 5
         self.projectile = []
         self.prix = 100
         self.force = 1
