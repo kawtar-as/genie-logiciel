@@ -20,7 +20,7 @@ class Parcours():
                      [50,80],
                      [100,80]]
         
-        self.noeuds2=[[0,10],
+        self.noeuds2=[[0,0],
                      [20,10],
                      [20,40],
                      [50,40],
@@ -30,15 +30,19 @@ class Parcours():
                      [30,60],
                      [30,80],
                      [100,80]]
-        self.noeuds = [[0, 10],
-                       [20, 40],
-                       [50, 40],
-                       [50, 20],
-                       [80, 20],
-                       [80, 60],
-                       [30, 60],
-                       [30, 80],
-                       [100, 80]]
+        self.noeuds = [[0, 0],
+                       [22, 35],
+                       [53, 35],
+                       [53, 23],
+                       [75, 23],
+                       [75, 55],
+                       [33, 55],
+                       [33, 77],
+                       [100, 77]]
+        
+        self.place_tour =[[20, 40],
+                          [20, 60],
+                          [65, 40]]
 
 class Tour():
     def __init__(self,parent,pos_x, pos_y):
@@ -47,7 +51,7 @@ class Tour():
         self.pos_y = pos_y
         self.cible = [0,0]
         self.vitesse_tir = 5
-        self.rayon = 0
+        self.rayon = 5
         self.projectile = []
         self.prix = 100
         self.force = 1
@@ -65,7 +69,6 @@ class Missile():
         self.vitesse = vitesse
         self.dmg = dmg
         self.taille = taille
-
 
 class Creep():
     def __init__(self,parent):
@@ -87,7 +90,6 @@ class Creep():
         self.vitesse=2
         self.force=10
         self.creep_vie = 10
-
     def bouge(self):
         # 1. V�rifier si on a fini le parcours (S�curit�)
         if self.cible >= len(self.parent.parcours.noeuds):
@@ -153,7 +155,7 @@ class Nivo(): ##Vague
                         ajoute=1
             else:
                 ajoute=1
-            if ajoute:  ## les faire bouger sur le chemin 
+            if ajoute: ## les faire bouger sur le chemin 
                 c=self.creeps.pop(0)
                 c.pos=self.parcours.noeuds[0][:] # on positionne le creep sur le prmier noeud
                 c.cible=1 #on vise le prochain noeud, le deuxieme
@@ -165,9 +167,9 @@ class Nivo(): ##Vague
             if(i.cible >= len(self.parcours.noeuds)):
                 self.creepsEnCours.remove(i)
             
-    def setTour(self,pos):
-        print("NIVO",pos)
-        self.tours.append(Tour(self,pos))
+    def setTour(self,pos_x,pos_y):
+        print("NIVO",pos_x,pos_y)
+        self.tours.append(Tour(self,pos_x,pos_y))
         
 class Modele():
     def __init__(self, parent):
@@ -181,9 +183,9 @@ class Modele():
     def demarrePartie(self):
         self.nivo=self.nivo+1
         self.nivoActif=Nivo(self)
-    def setTour(self,pos):
-        print("MODELE",pos)
-        self.nivoActif.setTour(pos)
+    def setTour(self,pos_x,pos_y):
+        print("MODELE",pos_x,pos_y)
+        self.nivoActif.setTour(pos_x,pos_y)
 
 if __name__ == '__main__':
     m=Modele(1)
