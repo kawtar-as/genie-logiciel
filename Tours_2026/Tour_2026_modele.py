@@ -30,25 +30,27 @@ class Parcours():
                      [30,60],
                      [30,80],
                      [100,80]]
-        self.noeuds = [[0, 10],
-                       [20, 40],
-                       [50, 40],
-                       [50, 20],
-                       [80, 20],
-                       [80, 60],
-                       [30, 60],
-                       [30, 80],
-                       [100, 80]]
-       
-
-class Emplacement():
-    def __init__(self):
-        self.isOccupied = None 
-        # objet emplacement dans la liste
-        a =  {}
-        self.cases=[[65, 60],
+        self.noeuds = [[0, 0],
+                       [22, 35],
+                       [53, 35],
+                       [53, 23],
+                       [75, 23],
+                       [75, 55],
+                       [33, 55],
+                       [33, 77],
+                       [100, 77]]
+        
+        self.emplacements=[[65, 60],
                           [20, 110],
                           [165, 90]]
+       
+#créer emplacement = new Emplacement(self.parcours.emplacements[0])
+class Emplacement():
+    def __init__(self, modele, pos_x, pos_y):
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+        self.id = modele.creerId()
+        self.isOccupied = None 
         
 
 
@@ -142,13 +144,13 @@ class Nivo(): ##Vague
     def __init__(self,parent):
         self.parent=parent
         self.parcours = Parcours()
-        self.emplacement = Emplacement()
         self.densiteCreep=3
         self.tours=[]
         self.creeps=[]
         self.creepsEnCours=[]
         self.creeCreep()
         
+    
     def ajouteTour(self,pos_x,pos_y):
         self.tours.append(Tour(self,pos_x,pos_y))
         
@@ -185,6 +187,7 @@ class Nivo(): ##Vague
         self.tours.append(Tour(self,pos_x,pos_y))
         
 class Modele():
+    
     def __init__(self, parent):
         self.parent=parent
         self.vie=20
@@ -193,7 +196,17 @@ class Modele():
         self.creepforce=5
         self.nivo=0
         self.compteur = 0
+        self.parcours = Parcours()# À modifier plus tard
         
+        self.emplacements = self.creer_Emplacement()
+
+    def creer_Emplacement(self):
+        liste=[]
+        for x,y in self.parcours.emplacements:
+            emplacement = Emplacement(self,x,y)
+            liste.append(emplacement)
+        return liste
+
     def demarrePartie(self):
         self.nivo=self.nivo+1
         self.nivoActif=Nivo(self)
@@ -205,8 +218,9 @@ class Modele():
     def creerId(self):
         s = "id_" + str(self.compteur)
         self.compteur += 1
-        print(s)
         return s
+
+    
 
 
 if __name__ == '__main__':

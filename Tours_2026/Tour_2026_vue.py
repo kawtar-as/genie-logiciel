@@ -41,8 +41,8 @@ class Vue():
     def getPosTour(self, evt):
         x = evt.x / 5
         y = evt.y / 5
-       ## print ("POS",x,y)
         self.parent.setTour(x, y)
+        
 
     def afficheModele(self):
         self.canevas.delete("all")
@@ -56,10 +56,9 @@ class Vue():
         self.canevas.create_line(pos, width=40, fill="black", tags=("chemin",))
 
     def afficherCasesVides(self):
-        for i in self.parent.modele.nivoActif.emplacement.cases:
-            id = self.parent.modele.creerId()
-            self.canevas.create_rectangle((i[0] - 10) * 2, (i[1] - 10) * 2 , (i[0] + 10) * 2 , (i[1] + 10) * 2, fill="red", tags=("cases", id))
-            self.canevas.tag_bind(id, "<Button-1>", self.getPosTour)
+        for i in self.parent.modele.emplacements:
+            self.canevas.create_rectangle((i.pos_x - 10) * 2, (i.pos_y - 10) * 2 , (i.pos_x + 10) * 2 , (i.pos_y + 10) * 2, fill="red", tags=("cases", i.id))
+            self.canevas.tag_bind(i.id, "<Button-1>", self.getPosTour)
 
     def afficheCreepTourBombe(self):
         self.canevas.delete("creep")
