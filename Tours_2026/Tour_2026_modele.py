@@ -61,7 +61,7 @@ class Tour():
         self.pos_y = pos_y
         self.cible = [0,0]
         self.vitesse_tir = 5
-        self.rayon = 0
+        self.rayon = 15
         self.projectile = []
         self.prix = 100
         self.force = 1
@@ -69,6 +69,8 @@ class Tour():
         self.rayon = rayon
         self.cible = cible
 
+    def getPosition(self):
+        return self.pos_x, self.pos_y
 
 
 
@@ -137,7 +139,9 @@ class Creep():
         self.parent.parent.vie -= valeur
         print(self.parent.parent.vie)
 
-        
+    def getPosition(self):
+        return self.pos[0], self.pos[1]
+
 class Nivo(): ##Vague
     def __init__(self,parent):
         self.parent=parent
@@ -183,6 +187,23 @@ class Nivo(): ##Vague
     def setTour(self,pos_x,pos_y):
         print("NIVO",pos_x,pos_y)
         self.tours.append(Tour(self,pos_x,pos_y))
+
+    def creepDansRadio(self):
+        for tour in self.tours:
+            xTour, yTour = tour.getPosition()
+            for creep in self.creepsEnCours:
+                xCreep, yCreep = creep.getPosition()
+                deltax = self.diference(xTour, xCreep)
+                deltaY = self.diference(yTour, yCreep)
+                if (deltax <= tour.rayon and deltaY <= tour.rayon):
+                    print("creep dans le rayon")
+                    return True
+                # else: 
+                #     print("dehors")
+                    
+
+    def diference(self, n1, n2):
+        return abs(abs(n1)-abs(n2))
         
 class Modele():
     def __init__(self, parent):
