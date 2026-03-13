@@ -39,6 +39,10 @@ class Parcours():
                        [30, 60],
                        [30, 80],
                        [100, 80]]
+        
+        self.place_tour =[[20, 40],
+                          [20, 60],
+                          [65, 40]]
 
 class Tour():
     def __init__(self,parent,pos_x, pos_y):
@@ -163,9 +167,9 @@ class Nivo(): ##Vague
             if(i.cible >= len(self.parcours.noeuds)):
                 self.creepsEnCours.remove(i)
             
-    def setTour(self,pos):
-        print("NIVO",pos)
-        self.tours.append(Tour(self,pos))
+    def setTour(self,pos_x,pos_y):
+        print("NIVO",pos_x,pos_y)
+        self.tours.append(Tour(self,pos_x,pos_y))
         
 class Modele():
     def __init__(self, parent):
@@ -179,9 +183,9 @@ class Modele():
     def demarrePartie(self):
         self.nivo=self.nivo+1
         self.nivoActif=Nivo(self)
-    def setTour(self,pos):
-        print("MODELE",pos)
-        self.nivoActif.setTour(pos)
+    def setTour(self,pos_x,pos_y):
+        print("MODELE",pos_x,pos_y)
+        self.nivoActif.setTour(pos_x,pos_y)
 
 if __name__ == '__main__':
     m=Modele(1)

@@ -15,8 +15,8 @@ class Controleur():
             self.actif = 1
             self.modele.demarrePartie()
             self.vue.creer_boite_menu()
-            
             self.vue.afficheModele()
+            self.vue.afficherCasesVides()
             self.continuePartie()
         else:
             self.actif = 0
@@ -31,8 +31,8 @@ class Controleur():
             if self.modele.vie == 0:
                 self.actif = 0
 
-    def setTour(self, pos):
-        self.modele.setTour(pos)
+    def setTour(self, pos_x,pos_y):
+        self.modele.setTour(pos_x,pos_y)
 
 
 if __name__ == '__main__':
