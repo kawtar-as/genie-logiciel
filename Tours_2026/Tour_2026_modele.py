@@ -40,9 +40,19 @@ class Parcours():
                        [30, 80],
                        [100, 80]]
        
-        self.place_tour =[[20, 40],
-                          [20, 60],
-                          [65, 40]]
+
+class Emplacement():
+    def __init__(self):
+        self.isOccupied = None 
+        # objet emplacement dans la liste
+        a =  {}
+        self.cases=[[65, 60],
+                          [20, 110],
+                          [165, 90]]
+        
+
+
+
 
 class Tour():
     def __init__(self,parent,pos_x, pos_y):
@@ -132,6 +142,7 @@ class Nivo(): ##Vague
     def __init__(self,parent):
         self.parent=parent
         self.parcours = Parcours()
+        self.emplacement = Emplacement()
         self.densiteCreep=3
         self.tours=[]
         self.creeps=[]
@@ -181,13 +192,22 @@ class Modele():
         self.creepparnivo=12
         self.creepforce=5
         self.nivo=0
+        self.compteur = 0
         
     def demarrePartie(self):
         self.nivo=self.nivo+1
         self.nivoActif=Nivo(self)
+
     def setTour(self,pos_x,pos_y):
         print("MODELE",pos_x,pos_y)
         self.nivoActif.setTour(pos_x,pos_y)
+
+    def creerId(self):
+        s = "id_" + str(self.compteur)
+        self.compteur += 1
+        print(s)
+        return s
+
 
 if __name__ == '__main__':
     m=Modele(1)
