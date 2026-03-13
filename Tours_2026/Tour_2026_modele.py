@@ -20,7 +20,7 @@ class Parcours():
                      [50,80],
                      [100,80]]
         
-        self.noeuds2=[[0,0],
+        self.noeuds2=[[0,10],
                      [20,10],
                      [20,40],
                      [50,40],
@@ -30,19 +30,29 @@ class Parcours():
                      [30,60],
                      [30,80],
                      [100,80]]
-        self.noeuds = [[0, 0],
-                       [22, 35],
-                       [53, 35],
-                       [53, 23],
-                       [75, 23],
-                       [75, 55],
-                       [33, 55],
-                       [33, 77],
-                       [100, 77]]
+        self.noeuds = [[0, 10],
+                       [20, 40],
+                       [50, 40],
+                       [50, 20],
+                       [80, 20],
+                       [80, 60],
+                       [30, 60],
+                       [30, 80],
+                       [100, 80]]
+       
+
+class Emplacement():
+    def __init__(self):
+        self.isOccupied = None 
+        # objet emplacement dans la liste
+        a =  {}
+        self.cases=[[65, 60],
+                          [20, 110],
+                          [165, 90]]
         
-        self.place_tour =[[20, 40],
-                          [20, 60],
-                          [65, 40]]
+
+
+
 
 class Tour():
     def __init__(self,parent,pos_x, pos_y):
@@ -51,7 +61,7 @@ class Tour():
         self.pos_y = pos_y
         self.cible = [0,0]
         self.vitesse_tir = 5
-        self.rayon = 5
+        self.rayon = 0
         self.projectile = []
         self.prix = 100
         self.force = 1
@@ -69,6 +79,7 @@ class Missile():
         self.vitesse = vitesse
         self.dmg = dmg
         self.taille = taille
+
 
 class Creep():
     def __init__(self,parent):
@@ -90,6 +101,7 @@ class Creep():
         self.vitesse=2
         self.force=10
         self.creep_vie = 10
+
     def bouge(self):
         # 1. V�rifier si on a fini le parcours (S�curit�)
         if self.cible >= len(self.parent.parcours.noeuds):
@@ -130,14 +142,15 @@ class Nivo(): ##Vague
     def __init__(self,parent):
         self.parent=parent
         self.parcours = Parcours()
+        self.emplacement = Emplacement()
         self.densiteCreep=3
         self.tours=[]
         self.creeps=[]
         self.creepsEnCours=[]
         self.creeCreep()
         
-    def ajouteTour(self,pos):
-        self.tours.append(Tour(self,pos))
+    def ajouteTour(self,pos_x,pos_y):
+        self.tours.append(Tour(self,pos_x,pos_y))
         
         
     def creeCreep(self):
@@ -155,7 +168,7 @@ class Nivo(): ##Vague
                         ajoute=1
             else:
                 ajoute=1
-            if ajoute: ## les faire bouger sur le chemin 
+            if ajoute:  ## les faire bouger sur le chemin 
                 c=self.creeps.pop(0)
                 c.pos=self.parcours.noeuds[0][:] # on positionne le creep sur le prmier noeud
                 c.cible=1 #on vise le prochain noeud, le deuxieme
@@ -179,13 +192,22 @@ class Modele():
         self.creepparnivo=12
         self.creepforce=5
         self.nivo=0
+        self.compteur = 0
         
     def demarrePartie(self):
         self.nivo=self.nivo+1
         self.nivoActif=Nivo(self)
+
     def setTour(self,pos_x,pos_y):
         print("MODELE",pos_x,pos_y)
         self.nivoActif.setTour(pos_x,pos_y)
+
+    def creerId(self):
+        s = "id_" + str(self.compteur)
+        self.compteur += 1
+        print(s)
+        return s
+
 
 if __name__ == '__main__':
     m=Modele(1)
