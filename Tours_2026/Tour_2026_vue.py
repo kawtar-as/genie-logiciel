@@ -24,7 +24,7 @@ class Vue():
 
     def creer_carte(self):
         self.canevas = tk.Canvas(self.frame_principale, width=500, height=500)
-        self.canevas.grid(row=0, column=0)
+        self.canevas.grid(row=1, column=0)
         self.chemin1 = Image.open("Tours_2026/chemin1.png")
         self.resize = self.chemin1.resize((500, 500), Image.Resampling.LANCZOS)
         self.chmin_img = ImageTk.PhotoImage(self.resize)
@@ -33,13 +33,26 @@ class Vue():
     def creer_boite_menu(self):
         self.frame_tours = tk.Frame(self.frame_principale,width=400, height=500, bg="#444")
         self.frame_tours.grid_propagate(False)
-        self.frame_tours.grid(row=0, column=1, sticky="nsew")
+        self.frame_tours.grid(row=1, column=1, sticky="nsew")
 
         self.label_tour = tk.Label(self.frame_tours, text="tour1", fg="black", bg="#999", font=("Arial", 12))
         self.label_tour.pack(pady=10)
 
-        self.label_tour = tk.Label(self.frame_tours, text="vie:" + str(self.parent.modele.vie), fg="black", bg="#999", font=("Arial", 12))
-        self.label_tour.pack(pady=10)
+        
+        self.frame_infomations = tk.Frame(self.frame_principale,width=400, height=100, bg="#444")
+        self.frame_infomations.grid_propagate(False)
+        self.frame_infomations.grid(row=0, column=0, sticky="nsew")
+        self.label_vie = tk.Label(self.frame_infomations, text="vie:" + str(self.parent.modele.vie), fg="black", bg="#999", font=("Arial", 12))
+        self.label_vie.grid(row=0,column=0)
+        self.label_vie.pack()
+
+        self.label_argent = tk.Label(self.frame_infomations, text="Argent:" + str(self.parent.modele.cash), fg="black", bg="#999", font=("Arial", 12))
+        self.label_argent.grid(row=1,column=0)
+        self.label_argent.pack()
+        
+        self.btn_start = tk.Button(self.frame_infomations, text = "Start")
+        self.btn_start .grid(row=2,column=0)
+        self.btn_start .pack()
        
 
 
