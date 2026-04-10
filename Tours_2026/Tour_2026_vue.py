@@ -38,6 +38,11 @@ class Vue():
         self.label_tour = tk.Label(self.frame_tours, text="tour1", fg="black", bg="#999", font=("Arial", 12))
         self.label_tour.pack(pady=10)
 
+        self.label_tour = tk.Label(self.frame_tours, text="vie:" + str(self.parent.modele.vie), fg="black", bg="#999", font=("Arial", 12))
+        self.label_tour.pack(pady=10)
+       
+
+
     def getPosTour(self, evt):
         x = evt.x / 5
         y = evt.y / 5
