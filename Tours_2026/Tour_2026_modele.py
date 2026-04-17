@@ -214,6 +214,7 @@ class Modele():
         self.creepforce=5
         self.nivo=0
         self.compteur = 0
+        # self.paused = False
         
     def demarrePartie(self):
         self.nivo=self.nivo+1
@@ -228,7 +229,13 @@ class Modele():
         self.compteur += 1
         print(s)
         return s
-
+    # def pause(self):
+    #     if self.paused == False:
+    #         self.paused = True
+    #     else:
+    #         self.paused = False
+        
+        
 
 if __name__ == '__main__':
     m=Modele(1)

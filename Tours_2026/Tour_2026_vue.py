@@ -37,22 +37,42 @@ class Vue():
 
         self.label_tour = tk.Label(self.frame_tours, text="tour1", fg="black", bg="#999", font=("Arial", 12))
         self.label_tour.pack(pady=10)
-
+       
         
-        self.frame_infomations = tk.Frame(self.frame_principale,width=400, height=100, bg="#444")
+        self.frame_infomations = tk.Frame(self.frame_principale,width=400, height=50, bg="#444")
         self.frame_infomations.grid_propagate(False)
-        self.frame_infomations.grid(row=0, column=0, sticky="nsew")
-        self.label_vie = tk.Label(self.frame_infomations, text="vie:" + str(self.parent.modele.vie), fg="black", bg="#999", font=("Arial", 12))
-        self.label_vie.grid(row=0,column=0)
-        self.label_vie.pack()
+        self.frame_infomations.grid(row=0, column=0,columnspan=4 ,sticky="nsew")
 
-        self.label_argent = tk.Label(self.frame_infomations, text="Argent:" + str(self.parent.modele.cash), fg="black", bg="#999", font=("Arial", 12))
-        self.label_argent.grid(row=1,column=0)
-        self.label_argent.pack()
-        
-        self.btn_start = tk.Button(self.frame_infomations, text = "Start")
-        self.btn_start .grid(row=2,column=0)
-        self.btn_start .pack()
+        self.label_vie = tk.Label(self.frame_infomations, text="vie:" + str(self.parent.modele.vie), fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_vie.grid(row=0,column=0,sticky="ew")
+        self.label_vie.grid(pady=10,padx=10)
+
+        self.label_argent = tk.Label(self.frame_infomations, text="Argent:" + str(self.parent.modele.cash), fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_argent.grid(row=0,column=1,sticky="ew")
+        self.label_argent.grid(pady=10,padx=10)
+
+        self.label_score = tk.Label(self.frame_infomations, text="Score:" + str(0), fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_score.grid(row=0,column=2,sticky="ew")
+        self.label_score.grid(pady=10,padx=10)
+
+        self.label_niveau = tk.Label(self.frame_infomations, text="Niveau:" + str(self.parent.modele.nivo), fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_niveau.grid(row=0,column=3,sticky="ew")
+        self.label_niveau.grid(pady=10,padx=10)
+        #pour le bouttons
+        self.frame_allbtns = tk.Menu(self.frame_infomations,tearoff=0)
+        self.frame_allbtns.add_command(label="Start")
+        self.frame_allbtns.add_command(label="Pause", command=self.parent.pause)
+        self.frame_allbtns.add_command(label="Start game")
+        #ajouter les commande frame_allbtns
+        self.frame_options = tk.Button(self.frame_infomations, text="Game options")
+        self.frame_options.grid(row=0,column=4,sticky="ew")
+        self.frame_options.grid(pady=10,padx=10)
+        # lier le click avec le btnss
+        self.frame_options.config(command=self.afficher_options)
+
+        self.btn_vague_automatique = tk.Button(self.frame_infomations, text = "vague automatique", bg="#7D9EC0")
+        self.btn_vague_automatique .grid(row=0,column=5,sticky="ew")
+        self.btn_vague_automatique .grid(pady=10,padx=10)
        
 
 
@@ -84,6 +104,9 @@ class Vue():
         self.canevas.delete("tour")
         self.canevas.delete("bombe")
 
+   
+
+
         # Logique originale pr�serv�e (via nivoActif)
         for i in self.parent.modele.nivoActif.creepsEnCours:
             x1 = i.pos[0] * 5 - 3
@@ -100,3 +123,12 @@ class Vue():
             y2 = i.pos_y * 5 + 5
             # print("LOCtour",i.pos,x1,y1,x2,y2)
             self.canevas.create_rectangle(x1, y1, x2, y2, width=10, fill="green", tags=("tour",))
+
+    def afficher_options(self):
+        x= self.frame_options.winfo_rootx()
+        y= self.frame_options.winfo_rooty()
+        self.frame_allbtns.post(x,y)
+
+    
+    # def pause(self,evt):
+    #     self.parent.pause(evt)
