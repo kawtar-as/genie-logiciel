@@ -29,17 +29,64 @@ class Vue():
         self.resize = self.chemin1.resize((500, 500), Image.Resampling.LANCZOS)
         self.chmin_img = ImageTk.PhotoImage(self.resize)
 
+    def resizeImages(self, chemin, largeur, hauteur):
+        try:
+            raw_img = Image.open(chemin)
+            resized_img = raw_img.resize((largeur, hauteur), Image.Resampling.LANCZOS)
+            return ImageTk.PhotoImage(resized_img)
+        except Exception as e:
+            print(f"Error image {chemin}: {e}")
+            return None
 
     def creer_boite_menu(self):
+        self.frame_tours = tk.Frame(self.frame_principale, width=200, height=500, bg="#444")
+        self.frame_tours.grid_propagate(FALSE)
+        self.frame_tours.grid(row=1, column=2, sticky="nsew")
+
+        chemin_routes = [
+            "images/tour1.png",
+            "images/tour2.png",
+            "images/tour3.png",
+            "images/tour4.png",
+            "images/tour5.png",
+            "images/tour6.png",
+
+        ]
+        
+        self.photo_tours = []
+        self.btns_tours = []
+
+        for i in range(len(chemin_routes)):
+            photo = self.resizeImages(chemin_routes[i], 50, 50)
+            
+            if photo:
+                self.photo_tours.append(photo)
+                # Creation btn
+                btn = tk.Button(
+                    self.frame_tours, 
+                    image=photo, 
+                    # command
+                    borderwidth=0,
+                    bg="#999",
+                    activebackground="#777",
+                    cursor="hand2"
+                )
+                lin = i // 2
+                col = i % 2
+                
+                btn.grid(row=lin, column=col, padx=10, pady=10)
+    
+                self.btns_tours.append(btn)
+                setattr(self, f"btn_tour{i}", btn)
+
         self.frame_tours = tk.Frame(self.frame_principale,width=400, height=500, bg="#444")
         self.frame_tours.grid_propagate(False)
         self.frame_tours.grid(row=1, column=1, sticky="nsew")
 
-        self.label_tour = tk.Label(self.frame_tours, text="tour1", fg="black", bg="#999", font=("Arial", 12))
-        self.label_tour.pack(pady=10)
+        
        
         
-        self.frame_infomations = tk.Frame(self.frame_principale,width=400, height=50, bg="#444")
+        self.frame_infomations = tk.Frame(self.frame_principale,width=300, height=50, bg="#444")
         self.frame_infomations.grid_propagate(False)
         self.frame_infomations.grid(row=0, column=0,columnspan=4 ,sticky="nsew")
 
