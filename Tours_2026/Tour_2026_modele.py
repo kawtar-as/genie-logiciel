@@ -65,6 +65,13 @@ class Tour():
         self.projectile = []
         self.prix = 100
         self.force = 1
+        ##self.focus
+
+
+        self.focus = self.parent.creepsEnCours[0]
+        
+
+
     def tirer(self, rayon, cible):
         self.rayon = rayon
         self.cible = cible
@@ -149,22 +156,37 @@ class Nivo(): ##Vague
         self.emplacement = Emplacement()
         self.densiteCreep=3
         self.tours=[]
-        self.creeps=[]
+        self.creeps={}
         self.creepsEnCours=[]
+        self.compteur = 0
+        self.creepPopCount = 0
         self.creeCreep()
         
+    
+    def creerId(self):
+       ## s = "creep_" + str(self.compteur)
+        s = f"creep_{self.compteur}"
+        self.compteur += 1
+        print(s)
+        return s
+
+
     def ajouteTour(self,pos_x,pos_y):
         self.tours.append(Tour(self,pos_x,pos_y))
         
         
     def creeCreep(self):
         for i in range(self.parent.creepparnivo):
-            self.creeps.append(Creep(self))
+            self.creeps[self.creerId()] = Creep(self) 
+            ## self.creeps.add( Creep(self))
             
     def bougeCreep(self): ## bouger sur le chemin
         if self.creeps:
             ajoute=0
-            c=self.creeps[0]
+            ##if (self.creepPopCount == len(self.creeps)):
+            ##    self.creepPopCount = 0
+
+            c=self.creeps["creep_" + str(self.creepPopCount)]
             if self.creepsEnCours:
                 cPrecedent=self.creepsEnCours[0]
                 if cPrecedent.cible==1: # onverifie si le dernier creep parti est assez loin seulement s'il est sur le m�me tron�on
@@ -173,7 +195,8 @@ class Nivo(): ##Vague
             else:
                 ajoute=1
             if ajoute:  ## les faire bouger sur le chemin 
-                c=self.creeps.pop(0)
+                c=self.creeps.pop("creep_" + str(self.creepPopCount))
+                self.creepPopCount += 1
                 c.pos=self.parcours.noeuds[0][:] # on positionne le creep sur le prmier noeud
                 c.cible=1 #on vise le prochain noeud, le deuxieme
                 self.creepsEnCours.insert(0,c)
@@ -188,7 +211,7 @@ class Nivo(): ##Vague
         print("NIVO",pos_x,pos_y)
         self.tours.append(Tour(self,pos_x,pos_y))
 
-    def creepDansRadio(self):
+    def creepDansRayon(self):
         for tour in self.tours:
             xTour, yTour = tour.getPosition()
             for creep in self.creepsEnCours:
@@ -208,7 +231,7 @@ class Nivo(): ##Vague
 class Modele():
     def __init__(self, parent):
         self.parent=parent
-        self.vie=20
+        self.vie=200
         self.cash=0
         self.creepparnivo=12
         self.creepforce=5
@@ -240,5 +263,5 @@ class Modele():
 if __name__ == '__main__':
     m=Modele(1)
     m.demarrePartie()
-    print(m.nivo.creeps)
+    ##print(m.nivo.creeps)
     print("FIN")
