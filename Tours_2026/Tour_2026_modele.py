@@ -78,6 +78,67 @@ class Tour():
 
     def getPosition(self):
         return self.pos_x, self.pos_y
+    
+    def tirer(self):
+        for self in self.tours:
+             for creep in self.CreepsInTour:
+                 self.projectiles.append(Missile(self.x, self.y, creep.x, creep.y, self.vitesse_tir, self.force, 10))
+                 print("tirerrrrrr!")
+
+    def creepInRTour(self):
+        xTour, yTour = self.getPosition() # PRENDRE LA POSITION DE LA TOUR X,Y
+        for creep in self.parent.creepsEnCours:
+            ## peut etre check le tag 
+            xCreep, yCreep = creep.getPosition() # PRENDRE LA POSITION DU CREEP X,Y
+            deltax = self.parent.diference(xTour, xCreep)
+            deltaY = self.parent.diference(yTour, yCreep)
+            if (deltax <= self.rayon and deltaY <= self.rayon):
+                print("creep dans le rayon")
+                ## le tag du creep rajouter au tableau de la tour. 
+                self.CreepsInTour.append(creep)
+                return True
+            else:
+                # enlever le tag 
+                self.CreepsInTour.remove(creep)
+
+    def parcourToursPourTirer(self):
+        print(self.projectile)
+        for tour in self.parent.tours:
+            if self.creepInRTour(self, tour):
+            # Tirer kffjkposdpj
+                self.tirer
+                pass
+
+    # def tirer(self, tour):
+    #     for tour in self.tours:
+    #         for creep in tour.CreepsInTour:
+    #             tour.prjectiles.append(Missile(tour.x, tour.y, creep.x, creep.y, tour.vitesse_tir, tour.force, 10))
+        
+
+    # def creepInRTour(self, tour):
+    #     xTour, yTour = tour.getPosition() # PRENDRE LA POSITION DE LA TOUR X,Y
+    #     for creep in self.creepsEnCours:
+    #         ## peut etre check le tag 
+    #         xCreep, yCreep = creep.getPosition() # PRENDRE LA POSITION DU CREEP X,Y
+    #         deltax = self.diference(xTour, xCreep)
+    #         deltaY = self.diference(yTour, yCreep)
+    #         if (deltax <= tour.rayon and deltaY <= tour.rayon):
+    #             print("creep dans le rayon")
+    #             ## le tag du creep rajouter au tableau de la tour. 
+    #             tour.CreepsInTour.append(creep)
+    #             return True
+    #         else:
+    #             # enlever le tag 
+    #             tour.CreepsInTour.remove(creep)
+
+
+   
+    # def parcourToursPourTirer(self):
+    #     for tour in self.tours:
+    #         if self.creepInRTour(self, tour):
+    #             # Tirer kffjkposdpj
+                
+    #             pass
 
 
 
