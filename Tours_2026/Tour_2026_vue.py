@@ -108,7 +108,7 @@ class Vue():
         self.frame_allbtns = tk.Menu(self.frame_infomations,tearoff=0)
         self.frame_allbtns.add_command(label="Start")
         self.frame_allbtns.add_command(label="Pause", command=self.parent.pause)
-        self.frame_allbtns.add_command(label="Start game")
+        self.frame_allbtns.add_command(label="Start game",command = self.parent.modele.demarrePartie)
         #ajouter les commande frame_allbtns
         self.frame_options = tk.Button(self.frame_infomations, text="Game options")
         self.frame_options.grid(row=0,column=4,sticky="ew")
@@ -151,7 +151,7 @@ class Vue():
     def afficherCasesVides(self):
         for i in self.parent.modele.nivoActif.emplacement.cases:
             id = self.parent.modele.creerId()
-            self.canevas.create_rectangle((i[0] - 10) * 2, (i[1] - 10) * 2 , (i[0] + 10) * 2 , (i[1] + 10) * 2, fill="red", tags=("cases", id))
+            self.canevas.create_rectangle((i[0] - 10) * 2, (i[1] - 10) * 2 , (i[0] + 10) * 2 , (i[1] + 10) * 2, fill="black", tags=("cases", id))
             self.canevas.tag_bind(id, "<Button-1>", lambda event, x=i[0]*2, y=i[1]*2 : self.getPosTour(event, x, y))
 
     def afficheCreepTourBombe(self):

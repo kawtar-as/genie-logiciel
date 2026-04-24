@@ -46,9 +46,9 @@ class Emplacement():
         self.isOccupied = None 
         # objet emplacement dans la liste
         a =  {}
-        self.cases=[[65, 60],
-                          [20, 110],
-                          [165, 90]]
+        self.cases=[[100, 55],
+                        [56, 150],
+                        [161, 90]]
         
 
 
@@ -66,8 +66,6 @@ class Tour():
         self.prix = 100
         self.force = 1
         ##self.focus
-
-
         self.focus = self.parent.creepsEnCours[0]
         
 
