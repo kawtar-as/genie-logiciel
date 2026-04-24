@@ -79,9 +79,7 @@ class Vue():
                 self.btns_tours.append(btn)
                 setattr(self, f"btn_tour{i}", btn)
 
-        self.frame_tours = tk.Frame(self.frame_principale,width=400, height=500, bg="#444")
-        self.frame_tours.grid_propagate(False)
-        self.frame_tours.grid(row=1, column=1, sticky="nsew")
+        
 
         
        
