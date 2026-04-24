@@ -116,7 +116,7 @@ class Vue():
         # lier le click avec le btnss
         self.frame_options.config(command=self.afficher_options)
 
-        self.btn_vague_automatique = tk.Button(self.frame_infomations, text = "vague automatique", bg="#7D9EC0")
+        self.btn_vague_automatique = tk.Button(self.frame_infomations, text = "vague automatique", bg="green")
         self.btn_vague_automatique .grid(row=0,column=5,sticky="ew")
         self.btn_vague_automatique .grid(pady=10,padx=10)
        
