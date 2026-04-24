@@ -30,15 +30,15 @@ class Parcours():
                      [30,60],
                      [30,80],
                      [100,80]]
-        self.noeuds = [[0, 10],
-                       [20, 40],
-                       [50, 40],
-                       [50, 20],
-                       [80, 20],
-                       [80, 60],
-                       [30, 60],
-                       [30, 80],
-                       [100, 80]]
+        self.noeuds = [[0, 0],
+                       [22, 35],
+                       [53, 35],
+                       [53, 23],
+                       [75, 23],
+                       [75, 55],
+                       [33, 55],
+                       [33, 77],
+                       [100, 77]]
        
 
 class Emplacement():
@@ -267,6 +267,11 @@ class Nivo(): ##Vague
             i.bouge()
             if(i.cible >= len(self.parcours.noeuds)):
                 self.creepsEnCours.remove(i)
+
+
+    def nextVague(self):
+        
+        return True
             
     def setTour(self,pos_x,pos_y):
         print("NIVO",pos_x,pos_y)

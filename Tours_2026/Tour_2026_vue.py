@@ -131,12 +131,6 @@ class Vue():
         self.canevas.delete("all")
 
         self.canevas.create_image(0, 0, image=self.chmin_img, anchor=tk.NW)
-        pos = []
-        # On assume que nivoActif est initialis� au moment de l'affichage
-        for i in self.parent.modele.nivoActif.parcours.noeuds:
-            pos.append(i[0] * 5)
-            pos.append(i[1] * 5)
-        self.canevas.create_line(pos, width=40, fill="black", tags=("chemin",))
 
     def afficherCasesVides(self):
         for i in self.parent.modele.nivoActif.emplacement.cases:
