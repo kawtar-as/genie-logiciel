@@ -67,78 +67,47 @@ class Tour():
         self.force = 1
         ##self.focus
         self.focus = self.parent.creepsEnCours[0]
-        
-
-
-    def tirer(self, rayon, cible):
-        self.rayon = rayon
-        self.cible = cible
 
     def getPosition(self):
         return self.pos_x, self.pos_y
     
-    def tirer(self):
-        for self in self.tours:
-             for creep in self.CreepsInTour:
-                 self.projectiles.append(Missile(self.x, self.y, creep.x, creep.y, self.vitesse_tir, self.force, 10))
-                 print("tirerrrrrr!")
+    def creepInRTour(self, tour):
+         self.creepInRTour = []
+         xTour, yTour = tour.getPosition() 
 
-    def creepInRTour(self):
-        xTour, yTour = self.getPosition() # PRENDRE LA POSITION DE LA TOUR X,Y
-        for creep in self.parent.creepsEnCours:
-            ## peut etre check le tag 
-            xCreep, yCreep = creep.getPosition() # PRENDRE LA POSITION DU CREEP X,Y
-            deltax = self.parent.diference(xTour, xCreep)
-            deltaY = self.parent.diference(yTour, yCreep)
-            if (deltax <= self.rayon and deltaY <= self.rayon):
+         for creep in self.creepsEnCours:
+             xCreep, yCreep = creep.getPosition() # PRENDRE LA POSITION DU CREEP X,Y
+             deltax = self.diference(xTour, xCreep)
+             deltaY = self.diference(yTour, yCreep)
+             if (deltax <= tour.rayon and deltaY <= tour.rayon):
                 print("creep dans le rayon")
-                ## le tag du creep rajouter au tableau de la tour. 
-                self.CreepsInTour.append(creep)
-                return True
-            else:
-                # enlever le tag 
-                self.CreepsInTour.remove(creep)
-
-    def parcourToursPourTirer(self):
-        print(self.projectile)
-        for tour in self.parent.tours:
-            if self.creepInRTour(self, tour):
-            # Tirer kffjkposdpj
-                self.tirer
-                pass
-
-    # def tirer(self, tour):
-    #     for tour in self.tours:
-    #         for creep in tour.CreepsInTour:
-    #             tour.prjectiles.append(Missile(tour.x, tour.y, creep.x, creep.y, tour.vitesse_tir, tour.force, 10))
-        
-
-    # def creepInRTour(self, tour):
-    #     xTour, yTour = tour.getPosition() # PRENDRE LA POSITION DE LA TOUR X,Y
-    #     for creep in self.creepsEnCours:
-    #         ## peut etre check le tag 
-    #         xCreep, yCreep = creep.getPosition() # PRENDRE LA POSITION DU CREEP X,Y
-    #         deltax = self.diference(xTour, xCreep)
-    #         deltaY = self.diference(yTour, yCreep)
-    #         if (deltax <= tour.rayon and deltaY <= tour.rayon):
-    #             print("creep dans le rayon")
-    #             ## le tag du creep rajouter au tableau de la tour. 
-    #             tour.CreepsInTour.append(creep)
-    #             return True
-    #         else:
-    #             # enlever le tag 
-    #             tour.CreepsInTour.remove(creep)
-
-
+                 ## le tag du creep rajouter au tableau de la tour. 
+                tour.CreepsInTour.append(creep)
+                return len(self.CreepsInTour) > 0
+           
    
-    # def parcourToursPourTirer(self):
-    #     for tour in self.tours:
-    #         if self.creepInRTour(self, tour):
-    #             # Tirer kffjkposdpj
+    def tirer(self):
+        # On cherche s'il y a des creeps 
+        creeps_a_portee = []
+        for creep in self.parent.creepsEnCours:
+            dist = Helper.calcDistance(self.pos_x, self.pos_y, creep.pos[0], creep.pos[1])
+            if dist <= self.rayon:
+                creeps_a_portee.append(creep)
+
+        if creeps_a_portee:
+            # On cible le premier creep trouvé
+            cible = creeps_a_portee[0]
+            # Création du missile
+            nouveau_missile = Missile(self.pos_x, self.pos_y, self.vitesse_tir, self.force, 2)
+            nouveau_missile.cible_x = cible.pos[0]
+            nouveau_missile.cible_y = cible.pos[1]
+            self.projectile.append(nouveau_missile)
+      
+    def parcourToursPourTirer(self):
+        self.tirer()
                 
-    #             pass
 
-
+    
 
 class Missile():
     def __init__(self, x, y, vitesse, dmg, taille):
@@ -147,6 +116,19 @@ class Missile():
         self.vitesse = vitesse
         self.dmg = dmg
         self.taille = taille
+        self.cible_x =0
+        self.cible_y =0
+    def bouger_misile(self,creep) :
+        #éplace le missile vers destination
+        dist = Helper.calcDistance(self.x, self.y, self.cible_x, self.cible_y)
+        if dist > self.vitesse:
+            angle = Helper.calcAngle(self.x, self.y, self.cible_x, self.cible_y)
+            self.x, self.y = Helper.getAngledPoint(angle, self.vitesse, self.x, self.y)
+        else:
+            # Le missile a atteint sa cible
+            self.x, self.y = self.cible_x, self.cible_y
+            return True # Signale qu'il a touché
+        return False
 
 
 class Creep():
@@ -171,33 +153,22 @@ class Creep():
         self.creep_vie = 10
 
     def bouge(self):
-        # 1. V�rifier si on a fini le parcours (S�curit�)
+    
         if self.cible >= len(self.parent.parcours.noeuds):
             self.perdre_vie_joueur()
             return
-
-        # 2. Identifier le point de destination imm�diat
         cible_x, cible_y = self.parent.parcours.noeuds[self.cible]
         curr_x, curr_y = self.pos
-
-        # 3. Calculer la distance restante vers ce point
-        # (Utilise votre nouveau Helper ou l'alias)
         dist_restante = Helper.calcDistance(curr_x, curr_y, cible_x, cible_y)
 
-        # 4. Logique de mouvement
+  
         if dist_restante <= self.vitesse:
-            # CAS A : On d�passe ou on atteint la cible ce tour-ci
-            self.pos = [cible_x, cible_y]  # On se "snap" exactement sur le point
-            self.cible += 1  # On passe au prochain noeud
-
-            # Si c'�tait le dernier noeud, on blesse le joueur
+            self.pos = [cible_x, cible_y] 
+            self.cible += 1  
             if self.cible >= len(self.parent.parcours.noeuds):
                 self.perdre_vie_joueur()
         else:
-            # CAS B : On est encore en chemin
-            # On calcule l'angle vers la cible
             angle = Helper.calcAngle(curr_x, curr_y, cible_x, cible_y)
-            # On avance exactement de "vitesse" dans cette direction
             nouv_x, nouv_y = Helper.getAngledPoint(angle, self.vitesse, curr_x, curr_y)
             self.pos = [nouv_x, nouv_y]
 
@@ -242,22 +213,19 @@ class Nivo(): ##Vague
     def bougeCreep(self): ## bouger sur le chemin
         if self.creeps:
             ajoute=0
-            ##if (self.creepPopCount == len(self.creeps)):
-            ##    self.creepPopCount = 0
-
             c=self.creeps["creep_" + str(self.creepPopCount)]
             if self.creepsEnCours:
                 cPrecedent=self.creepsEnCours[0]
-                if cPrecedent.cible==1: # onverifie si le dernier creep parti est assez loin seulement s'il est sur le m�me tron�on
+                if cPrecedent.cible==1:
                     if cPrecedent.pos[c.axe]>c.pos[c.axe]+c.parent.densiteCreep:
                         ajoute=1
             else:
                 ajoute=1
-            if ajoute:  ## les faire bouger sur le chemin 
+            if ajoute:  
                 c=self.creeps.pop("creep_" + str(self.creepPopCount))
                 self.creepPopCount += 1
-                c.pos=self.parcours.noeuds[0][:] # on positionne le creep sur le prmier noeud
-                c.cible=1 #on vise le prochain noeud, le deuxieme
+                c.pos=self.parcours.noeuds[0][:] 
+                c.cible=1 
                 self.creepsEnCours.insert(0,c)
         n=0
         for i in self.creepsEnCours:
@@ -285,18 +253,24 @@ class Nivo(): ##Vague
                 if (deltax <= tour.rayon and deltaY <= tour.rayon):
                     print("creep dans le rayon")
                     return True
-                # else: 
-                #     print("dehors")
-                    
+              
 
     def diference(self, n1, n2):
         return abs(abs(n1)-abs(n2))
+    
+    def ajour_projectiles(self):
+        for t in self.tours:
+            for m in t.projectile[:]: 
+                touche = m.bouger_misile(None) 
+                if touche:
+                    t.projectile.remove(m)
+                  
         
 class Modele():
     def __init__(self, parent):
         self.parent=parent
         self.vie=200
-        self.cash=0
+        self.cash=250
         self.creepparnivo=12
         self.creepforce=5
         self.nivo=0

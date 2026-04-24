@@ -26,19 +26,19 @@ class Controleur():
         
 
     def continuePartie(self):
-        #if self.paused:
-            if self.actif:
-                self.modele.nivoActif.bougeCreep()
-                self.modele.nivoActif.creepDansRayon()
-                self.vue.afficheCreepTourBombe()
-                # Appel r�cursif via Tkinter
-                self.vue.root.after(self.delai, self.continuePartie)
-                #SI VIE JOUEUR == 0 alors partie termine
-                if self.modele.vie == 0:
-                    self.actif = 0
-        
+
             
-        
+            if self.actif:
+              self.modele.nivoActif.bougeCreep()
+            for tour in self.modele.nivoActif.tours:
+                tour.tirer()
+            self.modele.nivoActif.ajour_projectiles()
+            self.vue.afficheCreepTourBombe()
+            self.vue.root.after(self.delai, self.continuePartie)
+            if self.modele.vie <= 0: 
+                self.actif = 0
+                print("Partie Terminée")
+ 
    
     def pause(self, ):
         if self.actif == 0:

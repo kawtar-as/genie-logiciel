@@ -120,16 +120,7 @@ class Vue():
         self.btn_vague_automatique .grid(row=0,column=5,sticky="ew")
         self.btn_vague_automatique .grid(pady=10,padx=10)
        
-    def missile(self):
-        item = self.parent.modele.missile
-        for i in item:
-                self.canevas.create_rectangle(
-                i.x - i.taille_x,
-                i.y - i.taille.y,
-                i.x + i.taille.x,
-                i.y + i.taille.y,
-                fill="yellow"
-                )
+   
 
     def getPosTour(self, evt, x, y):
         if self.tour_active:
@@ -157,7 +148,7 @@ class Vue():
     def afficheCreepTourBombe(self):
         self.canevas.delete("creep")
         self.canevas.delete("tour")
-        self.canevas.delete("bombe")
+        self.canevas.delete("missile")
 
    
 
@@ -169,7 +160,15 @@ class Vue():
             x2 = i.pos[0] * 5 + 3
             y2 = i.pos[1] * 5 + 3
             self.canevas.create_oval(x1, y1, x2, y2, width=2, fill="red", tags=("creep",))
-
+        # pour les missiles 
+        for t in self.parent.modele.nivoActif.tours:
+            for m in t.projectile:
+                mx1 = m.x * 5 - m.taille
+                my1 = m.y * 5 - m.taille
+                mx2 = m.x * 5 + m.taille
+                my2 = m.y * 5 + m.taille
+                self.canevas.create_rectangle(mx1, my1, mx2, my2, fill="yellow", tags=("missile",))
+            
         # Logique originale pr�serv�e (via nivoActif)
         for i in self.parent.modele.nivoActif.tours:
             x1 = i.pos_x * 5 - 3
