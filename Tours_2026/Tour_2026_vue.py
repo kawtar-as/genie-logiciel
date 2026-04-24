@@ -8,6 +8,7 @@ class Vue():
     def __init__(self, parent):
         self.parent = parent
         self.root = tk.Tk()
+        self.tour_active = None
         # On garde votre logique de bouton
         b = tk.Button(self.root, text="Demarrer", command=self.parent.demarrePartie)
         b.pack()
@@ -65,7 +66,7 @@ class Vue():
                 btn = tk.Button(
                     self.frame_tours, 
                     image=photo, 
-                    # command
+                    command= lambda i=i : self.image_selectionne(i),
                     borderwidth=0,
                     bg="#999",
                     activebackground="#777",
@@ -119,24 +120,39 @@ class Vue():
         self.btn_vague_automatique .grid(row=0,column=5,sticky="ew")
         self.btn_vague_automatique .grid(pady=10,padx=10)
        
+    def missile(self):
+        item = self.parent.modele.missile
+        for i in item:
+                self.canevas.create_rectangle(
+                i.x - i.taille_x,
+                i.y - i.taille.y,
+                i.x + i.taille.x,
+                i.y + i.taille.y,
+                fill="yellow"
+                )
 
-
-    def getPosTour(self, evt):
-        x = evt.x / 5
-        y = evt.y / 5
-       ## print ("POS",x,y)
-        self.parent.setTour(x, y)
+    def getPosTour(self, evt, x, y):
+        if self.tour_active:
+            # On place l'image exactement aux coordonnées du centre de la case (x, y)
+            self.canevas.create_image(x, y, image=self.tour_active, tags=("tour_img",))
+            
+            # On informe le contrôleur (on divise par 5 car ton modèle semble scaler par 5)
+            self.parent.setTour(x / 5, y / 5)
 
     def afficheModele(self):
         self.canevas.delete("all")
+        self.canevas.delete("all")
 
+        self.canevas.create_image(0, 0, image=self.chmin_img, anchor=tk.NW)
+        pos = []
+        # On assume que nivoActif est initialis� au moment de l'affichage
         self.canevas.create_image(0, 0, image=self.chmin_img, anchor=tk.NW)
 
     def afficherCasesVides(self):
         for i in self.parent.modele.nivoActif.emplacement.cases:
             id = self.parent.modele.creerId()
             self.canevas.create_rectangle((i[0] - 10) * 2, (i[1] - 10) * 2 , (i[0] + 10) * 2 , (i[1] + 10) * 2, fill="red", tags=("cases", id))
-            self.canevas.tag_bind(id, "<Button-1>", self.getPosTour)
+            self.canevas.tag_bind(id, "<Button-1>", lambda event, x=i[0]*2, y=i[1]*2 : self.getPosTour(event, x, y))
 
     def afficheCreepTourBombe(self):
         self.canevas.delete("creep")
@@ -160,14 +176,15 @@ class Vue():
             y1 = i.pos_y * 5 - 5
             x2 = i.pos_x * 5 + 3
             y2 = i.pos_y * 5 + 5
-            # print("LOCtour",i.pos,x1,y1,x2,y2)
-            self.canevas.create_rectangle(x1, y1, x2, y2, width=10, fill="green", tags=("tour",))
+            
 
     def afficher_options(self):
         x= self.frame_options.winfo_rootx()
         y= self.frame_options.winfo_rooty()
         self.frame_allbtns.post(x,y)
+ 
+    def image_selectionne(self,i):
+        self.tour_active = self.photo_tours[i]
 
-    
     # def pause(self,evt):
     #     self.parent.pause(evt)
