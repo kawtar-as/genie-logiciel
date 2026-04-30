@@ -16,6 +16,8 @@ class Controleur():
         if self.actif == 0:
             self.actif = 1
             self.modele.demarrePartie()
+            self.vue.frame_interface.destroy()
+            self.vue.creer_carte()
             self.vue.creer_boite_menu()
             self.vue.afficheModele()
             self.vue.afficherCasesVides()

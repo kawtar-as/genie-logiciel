@@ -10,21 +10,33 @@ class Vue():
         self.root = tk.Tk()
         self.tour_active = None
         # On garde votre logique de bouton
-        b = tk.Button(self.root, text="Demarrer", command=self.parent.demarrePartie)
-        b.pack()
+        # b = tk.Button(self.root, text="Demarrer", command=self.parent.demarrePartie)
+        # b.pack()
         self.creer_fenetre_principale()
-        self.creer_carte()
+        self.creer_interface()
+      
         ##self.canevas = tk.Canvas(self.root, width=500, height=500)
         ##self.canevas.bind("<Button-1>", self.getPosTour)
         ##self.canevas.pack()
 
     def creer_fenetre_principale(self):
-        self.frame_principale = tk.Frame(self.root)
-        self.frame_principale.pack()
+       self.frame_principale = tk.Frame(self.root, bg="#2e2f31")
+       
+       self.frame_principale.pack()
 
+
+    def creer_interface(self):
+        self.frame_interface = tk.Frame(self.frame_principale,bg ="#2e2f31" )
+        self.frame_interface.grid(row=0, column=0, sticky="nsew")
+        
+        self.label_titre = tk.Label(self.frame_interface, text="TOUR DEFENSE", fg="#99AAB5", bg="#2e2f31" ,font=("Arial", 40))
+        self.label_titre.grid(padx=200,pady=200)
+
+        self.boutton_play = tk.Button(self.frame_interface, text="START GAME",bg="#7289DA" , font=("Arial", 10),command=self.parent.demarrePartie)
+        self.boutton_play.grid(pady = 10)
 
     def creer_carte(self):
-        self.canevas = tk.Canvas(self.frame_principale, width=500, height=500)
+        self.canevas = tk.Canvas(self.frame_principale ,width=500, height=500, bg="black")
         self.canevas.grid(row=1, column=0)
         self.chemin1 = Image.open("Tours_2026/chemin1.png")
         self.resize = self.chemin1.resize((500, 500), Image.Resampling.LANCZOS)
@@ -40,7 +52,7 @@ class Vue():
             return None
 
     def creer_boite_menu(self):
-        self.frame_tours = tk.Frame(self.frame_principale, width=200, height=500, bg="#444")
+        self.frame_tours = tk.Frame(self.frame_principale, width=200, height=500, bg="#2e2f31")
         self.frame_tours.grid_propagate(FALSE)
         self.frame_tours.grid(row=1, column=2, sticky="nsew")
 
@@ -71,6 +83,7 @@ class Vue():
                     bg="#999",
                     activebackground="#777",
                     cursor="hand2"
+
                 )
                 lin = i // 2
                 col = i % 2
@@ -80,14 +93,11 @@ class Vue():
                 self.btns_tours.append(btn)
                 setattr(self, f"btn_tour{i}", btn)
 
-        
 
         
-       
-        
-        self.frame_infomations = tk.Frame(self.frame_principale,width=300, height=50, bg="#444")
+        self.frame_infomations = tk.Frame(self.frame_principale,width=300, height=50, bg="#2e2f31")
         self.frame_infomations.grid_propagate(False)
-        self.frame_infomations.grid(row=0, column=0,columnspan=4 ,sticky="nsew")
+        self.frame_infomations.grid(row=0, column=0,columnspan=3 ,sticky="nsew")
 
         self.label_vie = tk.Label(self.frame_infomations, text="vie:" + str(self.parent.modele.vie), fg="black", bg="#7D9EC0", font=("Arial", 12))
         self.label_vie.grid(row=0,column=0,sticky="ew")
@@ -185,5 +195,8 @@ class Vue():
     def image_selectionne(self,i):
         self.tour_active = self.photo_tours[i]
 
+
+
+    
     # def pause(self,evt):
     #     self.parent.pause(evt)
