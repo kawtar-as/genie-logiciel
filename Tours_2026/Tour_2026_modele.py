@@ -66,7 +66,7 @@ class Tour():
         self.prix = 100
         self.force = 1
         ##self.focus
-        self.focus = self.parent.creepsEnCours[0]
+        self.focus = self.parent.nivoActif.creepsEnCours[0]
 
     def getPosition(self):
         return self.pos_x, self.pos_y
@@ -84,12 +84,16 @@ class Tour():
                  ## le tag du creep rajouter au tableau de la tour. 
                 tour.CreepsInTour.append(creep)
                 return len(self.CreepsInTour) > 0
+             
+
+    def diference(self, n1, n2):
+        return abs(abs(n1)-abs(n2))
            
    
     def tirer(self):
         # On cherche s'il y a des creeps 
         creeps_a_portee = []
-        for creep in self.parent.creepsEnCours:
+        for creep in self.parent.nivoActif.creepsEnCours:
             dist = Helper.calcDistance(self.pos_x, self.pos_y, creep.pos[0], creep.pos[1])
             if dist <= self.rayon:
                 creeps_a_portee.append(creep)
@@ -102,6 +106,7 @@ class Tour():
             nouveau_missile.cible_x = cible.pos[0]
             nouveau_missile.cible_y = cible.pos[1]
             self.projectile.append(nouveau_missile)
+    
       
     def parcourToursPourTirer(self):
         self.tirer()
@@ -118,7 +123,7 @@ class Missile():
         self.taille = taille
         self.cible_x =0
         self.cible_y =0
-    def bouger_misile(self,creep) :
+    def bouger_misile(self, creep) :
         #éplace le missile vers destination
         dist = Helper.calcDistance(self.x, self.y, self.cible_x, self.cible_y)
         if dist > self.vitesse:
@@ -136,6 +141,11 @@ class Creep():
         self.parent=parent
         self.pos=self.parent.parcours.noeuds[0][:]
         self.cible=1 #indice du noeud de parcours a atteindre
+        self.vitesse=2
+        self.force=10
+        self.creep_vie = 10
+        self.axe = 0
+
         if self.pos[0]!=self.parent.parcours.noeuds[1][0]: # on simplifie le mouvement en verifiant uniquement l'axe de deplacement
             self.axe=0
             if self.pos[0]<self.parent.parcours.noeuds[1][0]:
@@ -148,12 +158,10 @@ class Creep():
                 self.dir=1
             else:
                 self.dir=-1
-        self.vitesse=2
-        self.force=10
-        self.creep_vie = 10
-
+        
+    ## Les creeps suivent le chemin
     def bouge(self):
-    
+        ## si le creep arrive a la fin 
         if self.cible >= len(self.parent.parcours.noeuds):
             self.perdre_vie_joueur()
             return
@@ -172,6 +180,7 @@ class Creep():
             nouv_x, nouv_y = Helper.getAngledPoint(angle, self.vitesse, curr_x, curr_y)
             self.pos = [nouv_x, nouv_y]
 
+
     def perdre_vie_joueur(self, valeur=1):
         self.parent.parent.vie -= valeur
         print(self.parent.parent.vie)
@@ -185,7 +194,7 @@ class Nivo(): ##Vague
         self.parcours = Parcours()
         self.emplacement = Emplacement()
         self.densiteCreep=3
-        self.tours=[]
+        #self.tours=[]
         self.creeps={}
         self.creepsEnCours=[]
         self.compteur = 0
@@ -200,10 +209,6 @@ class Nivo(): ##Vague
         print(s)
         return s
 
-
-    def ajouteTour(self,pos_x,pos_y):
-        self.tours.append(Tour(self,pos_x,pos_y))
-        
         
     def creeCreep(self):
         for i in range(self.parent.creepparnivo):
@@ -234,70 +239,78 @@ class Nivo(): ##Vague
             if(i.cible >= len(self.parcours.noeuds)):
                 self.creepsEnCours.remove(i)
 
-
     def nextVague(self):
         
         return True
-            
-    def setTour(self,pos_x,pos_y):
-        print("NIVO",pos_x,pos_y)
-        self.tours.append(Tour(self,pos_x,pos_y))
-
-    def creepDansRayon(self):
-        for tour in self.tours:
-            xTour, yTour = tour.getPosition()
-            for creep in self.creepsEnCours:
-                xCreep, yCreep = creep.getPosition()
-                deltax = self.diference(xTour, xCreep)
-                deltaY = self.diference(yTour, yCreep)
-                if (deltax <= tour.rayon and deltaY <= tour.rayon):
-                    print("creep dans le rayon")
-                    return True
               
 
-    def diference(self, n1, n2):
-        return abs(abs(n1)-abs(n2))
-    
-    def ajour_projectiles(self):
-        for t in self.tours:
-            for m in t.projectile[:]: 
-                touche = m.bouger_misile(None) 
-                if touche:
-                    t.projectile.remove(m)
-                  
-        
-class Modele():
-    def __init__(self, parent):
-        self.parent=parent
+class Partie():
+    def __init__(self):
         self.vie=200
         self.cash=250
         self.creepparnivo=12
         self.creepforce=5
         self.nivo=0
         self.compteur = 0
+        self.tours=[] # Tableau avec les TOURS
         # self.paused = False
-        
-    def demarrePartie(self):
-        self.nivo=self.nivo+1
-        self.nivoActif=Nivo(self)
+    
+    ## Initiation des attributs (Creation de un Niveau)
+    def initPartie(self):
+            self.nivo=self.nivo+1 ## Le premier niveau
+            self.nivoActif=Nivo(self) ## Creation d'une vague
 
+    ## Attribution de la position de la tour
     def setTour(self,pos_x,pos_y):
         print("MODELE",pos_x,pos_y)
         self.nivoActif.setTour(pos_x,pos_y)
 
+    ## Creation de UNE TOUR et on la rajoute dans le tableau
+    ## setTour
+    def creerTour(self,pos_x,pos_y):
+        self.tours.append(Tour(self,pos_x,pos_y))
+
+    ## ID pour les emplacements des carrées
     def creerId(self):
         s = "id_" + str(self.compteur)
         self.compteur += 1
         print(s)
         return s
+
+    ## ajouter les projetctiles pour chaque tour
+    def ajour_projectiles(self):
+        for t in self.tours:
+            for m in t.projectile[:]: 
+                touche = m.bouger_misile(None) 
+                if touche:
+                    t.projectile.remove(m)
+
+    def toursTirent(self):
+        for tour in self.tours:
+            tour.tirer()
+                  
+    
+    
+
+class Modele():
+    def __init__(self, parent):
+        self.parent=parent
+        self.partie = None
+        ##self.isPaused ## la partie
+
+
+    def demarrePartie(self):
+        self.partie = Partie()
+        self.partie.initPartie()
+        
+
+    ## PAUSE tout le Jeu, LE JOEUR NE PEUT PAS JOUER
     # def pause(self):
     #     if self.paused == False:
     #         self.paused = True
     #     else:
     #         self.paused = False
-        
-        
-
+    
 if __name__ == '__main__':
     m=Modele(1)
     m.demarrePartie()

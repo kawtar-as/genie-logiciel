@@ -16,7 +16,7 @@ class Controleur():
         if self.actif == 0:
             self.actif = 1
             self.modele.demarrePartie()
-            self.vue.frame_interface.destroy()
+            self.vue.frame_lobby.destroy()
             self.vue.creer_carte()
             self.vue.creer_boite_menu()
             self.vue.afficheModele()
@@ -31,20 +31,20 @@ class Controleur():
 
             
             if self.actif:
-              self.modele.nivoActif.bougeCreep()
-            for tour in self.modele.nivoActif.tours:
+              self.modele.partie.nivoActif.bougeCreep()
+            for tour in self.modele.partie.tours:
                 tour.tirer()
-            self.modele.nivoActif.ajour_projectiles()
+            self.modele.partie.ajour_projectiles()
             self.vue.afficheCreepTourBombe()
             self.vue.root.after(self.delai, self.continuePartie)
-            if self.modele.vie <= 0: 
+            if self.modele.partie.vie <= 0: 
                 self.actif = 0
                 print("Partie Terminée")
  
    
     def pause(self, ):
         if self.actif == 0:
-            self.actif = 1
+            self.actif = 1 
             self.continuePartie()  # <--- CRITIQUE : Relance la boucle after
             print("Jeu repris")
         else:
@@ -52,7 +52,7 @@ class Controleur():
             print("Jeu en pause")
 
     def setTour(self, pos_x,pos_y):
-        self.modele.setTour(pos_x,pos_y)
+        self.modele.partie.creerTour(pos_x,pos_y)
     
 
 if __name__ == '__main__':

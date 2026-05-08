@@ -9,11 +9,16 @@ class Vue():
         self.parent = parent
         self.root = tk.Tk()
         self.tour_active = None
+        self.frame_principale = None
+        self.frame_splash = None
+        self.frame_lobby = None
+        self.frame_partie = None
         # On garde votre logique de bouton
         # b = tk.Button(self.root, text="Demarrer", command=self.parent.demarrePartie)
         # b.pack()
         self.creer_fenetre_principale()
-        self.creer_interface()
+        ## Splash est l'écran d'acceuil quand on lance le jeu
+        self.creer_splash()
       
         ##self.canevas = tk.Canvas(self.root, width=500, height=500)
         ##self.canevas.bind("<Button-1>", self.getPosTour)
@@ -25,14 +30,18 @@ class Vue():
        self.frame_principale.pack()
 
 
-    def creer_interface(self):
-        self.frame_interface = tk.Frame(self.frame_principale,bg ="#2e2f31" )
-        self.frame_interface.grid(row=0, column=0, sticky="nsew")
+    def changer_frame(self, nouveauFrame):
+        pass
+
+    def creer_splash(self):
+        self.frame_splash = tk.Frame(self.frame_principale,bg ="#2e2f31" )
+        self.frame_splash.grid(row=0, column=0, sticky="nsew")
         
-        self.label_titre = tk.Label(self.frame_interface, text="TOUR DEFENSE", fg="#99AAB5", bg="#2e2f31" ,font=("Arial", 40))
+
+        self.label_titre = tk.Label(self.frame_splash, text="TOUR DEFENSE", fg="#99AAB5", bg="#2e2f31" ,font=("Arial", 40))
         self.label_titre.grid(padx=200,pady=200)
 
-        self.boutton_play = tk.Button(self.frame_interface, text="START GAME",bg="#7289DA" , font=("Arial", 10),command=self.parent.demarrePartie)
+        self.boutton_play = tk.Button(self.frame_splash, text="START GAME",bg="#7289DA" , font=("Arial", 10),command=self.parent.demarrePartie)
         self.boutton_play.grid(pady = 10)
 
     def creer_carte(self):
@@ -99,11 +108,11 @@ class Vue():
         self.frame_infomations.grid_propagate(False)
         self.frame_infomations.grid(row=0, column=0,columnspan=3 ,sticky="nsew")
 
-        self.label_vie = tk.Label(self.frame_infomations, text="vie:" + str(self.parent.modele.vie), fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_vie = tk.Label(self.frame_infomations, text="vie:" + str(self.parent.modele.partie.vie), fg="black", bg="#7D9EC0", font=("Arial", 12))
         self.label_vie.grid(row=0,column=0,sticky="ew")
         self.label_vie.grid(pady=10,padx=10)
 
-        self.label_argent = tk.Label(self.frame_infomations, text="Argent:" + str(self.parent.modele.cash), fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_argent = tk.Label(self.frame_infomations, text="Argent:" + str(self.parent.modele.partie.cash), fg="black", bg="#7D9EC0", font=("Arial", 12))
         self.label_argent.grid(row=0,column=1,sticky="ew")
         self.label_argent.grid(pady=10,padx=10)
 
@@ -111,7 +120,7 @@ class Vue():
         self.label_score.grid(row=0,column=2,sticky="ew")
         self.label_score.grid(pady=10,padx=10)
 
-        self.label_niveau = tk.Label(self.frame_infomations, text="Niveau:" + str(self.parent.modele.nivo), fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_niveau = tk.Label(self.frame_infomations, text="Niveau:" + str(self.parent.modele.partie.nivo), fg="black", bg="#7D9EC0", font=("Arial", 12))
         self.label_niveau.grid(row=0,column=3,sticky="ew")
         self.label_niveau.grid(pady=10,padx=10)
         #pour le bouttons
@@ -150,8 +159,8 @@ class Vue():
         self.canevas.create_image(0, 0, image=self.chmin_img, anchor=tk.NW)
 
     def afficherCasesVides(self):
-        for i in self.parent.modele.nivoActif.emplacement.cases:
-            id = self.parent.modele.creerId()
+        for i in self.parent.modele.partie.nivoActif.emplacement.cases:
+            id = self.parent.modele.partie.creerId()
             self.canevas.create_rectangle((i[0] - 10) * 2, (i[1] - 10) * 2 , (i[0] + 10) * 2 , (i[1] + 10) * 2, fill="black", tags=("cases", id))
             self.canevas.tag_bind(id, "<Button-1>", lambda event, x=i[0]*2, y=i[1]*2 : self.getPosTour(event, x, y))
 
@@ -164,15 +173,15 @@ class Vue():
 
 
         # Logique originale pr�serv�e (via nivoActif)
-        for i in self.parent.modele.nivoActif.creepsEnCours:
+        for i in self.parent.modele.partie.nivoActif.creepsEnCours:
             x1 = i.pos[0] * 5 - 3
             y1 = i.pos[1] * 5 - 3
             x2 = i.pos[0] * 5 + 3
             y2 = i.pos[1] * 5 + 3
             self.canevas.create_oval(x1, y1, x2, y2, width=2, fill="red", tags=("creep",))
         # pour les missiles 
-        for t in self.parent.modele.nivoActif.tours:
-            for m in t.projectile:
+        for t in self.parent.modele.partie.tours: # pour tour in tours
+            for m in t.projectile: # misil dans tour
                 mx1 = m.x * 5 - m.taille
                 my1 = m.y * 5 - m.taille
                 mx2 = m.x * 5 + m.taille
@@ -180,7 +189,7 @@ class Vue():
                 self.canevas.create_rectangle(mx1, my1, mx2, my2, fill="yellow", tags=("missile",))
             
         # Logique originale pr�serv�e (via nivoActif)
-        for i in self.parent.modele.nivoActif.tours:
+        for i in self.parent.modele.partie.tours:
             x1 = i.pos_x * 5 - 3
             y1 = i.pos_y * 5 - 5
             x2 = i.pos_x * 5 + 3
