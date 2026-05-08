@@ -12,19 +12,19 @@ class Controleur():
         self.delai = 50  # Vitesse du jeu
 
     def demarrePartie(self):
-        
-        if self.actif == 0:
-            self.actif = 1
-            self.modele.demarrePartie()
-            self.vue.frame_lobby.destroy()
-            self.vue.creer_carte()
-            self.vue.creer_boite_menu()
-            self.vue.afficheModele()
-            self.vue.afficherCasesVides()
-            self.continuePartie()
-        else:
+        self.vue.changerFrame("principal")    
+        # if self.actif == 0:
+        #     self.actif = 1
+        #     self.modele.demarrePartie()
+        #   #  self.vue.frame_lobby.destroy()
+        #     self.vue.creer_carte()
+        #     self.vue.creer_boite_menu()
+        #     self.vue.afficheModele()
+        #     self.vue.afficherCasesVides()
+        #     self.continuePartie()
+        # else:
            
-            self.actif = 0
+        #     self.actif = 0
         
 
     def continuePartie(self):

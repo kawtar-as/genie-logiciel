@@ -9,40 +9,59 @@ class Vue():
         self.parent = parent
         self.root = tk.Tk()
         self.tour_active = None
-        self.frame_principale = None
-        self.frame_splash = None
-        self.frame_lobby = None
-        self.frame_partie = None
-        # On garde votre logique de bouton
+        self.frames = {}
+        self.frameActif = None
+
+        self.creerFrames()
+        self.changerFrame("splash")
+        
+
+         # On garde votre logique de bouton
         # b = tk.Button(self.root, text="Demarrer", command=self.parent.demarrePartie)
         # b.pack()
-        self.creer_fenetre_principale()
+        
         ## Splash est l'écran d'acceuil quand on lance le jeu
-        self.creer_splash()
+        
       
         ##self.canevas = tk.Canvas(self.root, width=500, height=500)
         ##self.canevas.bind("<Button-1>", self.getPosTour)
         ##self.canevas.pack()
 
-    def creer_fenetre_principale(self):
-       self.frame_principale = tk.Frame(self.root, bg="#2e2f31")
+
+    def creerFrames(self):
+        principal = self.creer_fenetre_principale()
+        self.frames["principal"] = principal
+        splash = self.creer_splash()
+        self.frames["splash"] = splash
+    
+    def changerFrame(self, nouveauFrame):
+        if self.frameActif:
+            self.frameActif.pack_forget()
+        self.frameActif = self.frames[nouveauFrame]
+        self.frameActif.pack()
+
+
        
-       self.frame_principale.pack()
+    def creer_fenetre_principale(self):
+        frame_principale = tk.Frame(self.root,)
+        frame_jeu = tk.Frame(frame_principale, width=200, height=200, background="red")
+        frame_jeu.grid(column=0, row=0)
+        return frame_principale
 
 
-    def changer_frame(self, nouveauFrame):
-        pass
+
+
 
     def creer_splash(self):
-        self.frame_splash = tk.Frame(self.frame_principale,bg ="#2e2f31" )
-        self.frame_splash.grid(row=0, column=0, sticky="nsew")
-        
+        frame_splash = tk.Frame(self.root,bg ="#2e2f31" )
+        frame_splash.grid(row=0, column=0, sticky="nsew")
 
-        self.label_titre = tk.Label(self.frame_splash, text="TOUR DEFENSE", fg="#99AAB5", bg="#2e2f31" ,font=("Arial", 40))
-        self.label_titre.grid(padx=200,pady=200)
+        label_titre = tk.Label(frame_splash, text="TOUR DEFENSE", fg="#99AAB5", bg="#2e2f31" ,font=("Arial", 40))
+        label_titre.grid(padx=200,pady=200)
 
-        self.boutton_play = tk.Button(self.frame_splash, text="START GAME",bg="#7289DA" , font=("Arial", 10),command=self.parent.demarrePartie)
+        self.boutton_play = tk.Button(frame_splash, text="START GAME",bg="#7289DA" , font=("Arial", 10),command=self.parent.demarrePartie)
         self.boutton_play.grid(pady = 10)
+        return frame_splash
 
     def creer_carte(self):
         self.canevas = tk.Canvas(self.frame_principale ,width=500, height=500, bg="black")
