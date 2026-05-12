@@ -63,7 +63,6 @@ class Tour():
         self.vitesse_tir = 5
         self.rayon = 15
         self.projectile = []
-        self.prix = 100
         self.force = 1
         ##self.focus
         self.focus = self.parent.nivoActif.creepsEnCours[0]
@@ -110,6 +109,8 @@ class Tour():
       
     def parcourToursPourTirer(self):
         self.tirer()
+
+    
                 
 
     
@@ -253,6 +254,7 @@ class Partie():
         self.nivo=0
         self.compteur = 0
         self.tours=[] # Tableau avec les TOURS
+        self.prix_tour = [0,30,50,80,100,175]
         # self.paused = False
     
     ## Initiation des attributs (Creation de un Niveau)
@@ -268,7 +270,23 @@ class Partie():
     ## Creation de UNE TOUR et on la rajoute dans le tableau
     ## setTour
     def creerTour(self,pos_x,pos_y):
-        self.tours.append(Tour(self,pos_x,pos_y))
+        # on attribue a chaque tour son prix 
+        if len(self.tours) == 0:
+            self.prix_tour[0]
+        elif len(self.tours) == 1:
+            self.prix_tour[1]
+        elif len(self.tours) == 2:
+            self.prix_tour[2]
+        elif len(self.tours) == 3:
+            self.prix_tour[3]
+        elif len(self.tours) == 4:
+            self.prix_tour[4]
+        elif len(self.tours) == 5:
+            self.prix_tour[5]
+
+
+        if self.acheter_tour(self.prix): 
+            self.tours.append(Tour(self,pos_x,pos_y))
 
     ## ID pour les emplacements des carrées
     def creerId(self):
@@ -288,6 +306,13 @@ class Partie():
     def toursTirent(self):
         for tour in self.tours:
             tour.tirer()
+
+    def acheter_tour(self,prix):
+            if self.cash >= prix:
+                self.cash -= prix
+                return True
+        
+
                   
     
     
