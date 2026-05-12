@@ -43,14 +43,106 @@ class Vue():
 
        
     def creer_fenetre_principale(self):
-        frame_principale = tk.Frame(self.root,)
-        frame_jeu = tk.Frame(frame_principale, width=200, height=200, background="red")
-        frame_jeu.grid(column=0, row=0)
-        return frame_principale
+        self.frame_principale = tk.Frame(self.root)
+        
+        # ---------------------------------------------------------
+        # 1. BARRE D'INFORMATIONS (En haut - Ligne 0)
+        # ---------------------------------------------------------
+        self.frame_infomations = tk.Frame(self.frame_principale, width=800, height=50, bg="#2e2f31")
+        self.frame_infomations.grid_propagate(False)
+        # S'étend sur deux colonnes pour couvrir le jeu et le menu des tours
+        self.frame_infomations.grid(row=0, column=0, columnspan=2, sticky="nsew")
+
+        # Combine grid() arguments into a single line to prevent Tkinter from overwriting them
+        self.label_vie = tk.Label(self.frame_infomations, text="Vie: --", fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_vie.grid(row=0, column=0, sticky="ew", pady=10, padx=10)
+
+        self.label_argent = tk.Label(self.frame_infomations, text="Argent: --", fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_argent.grid(row=0, column=1, sticky="ew", pady=10, padx=10)
+
+        self.label_score = tk.Label(self.frame_infomations, text="Score: 0", fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_score.grid(row=0, column=2, sticky="ew", pady=10, padx=10)
+
+        self.label_niveau = tk.Label(self.frame_infomations, text="Niveau: --", fg="black", bg="#7D9EC0", font=("Arial", 12))
+        self.label_niveau.grid(row=0, column=3, sticky="ew", pady=10, padx=10)
+
+        # Menu caché d'options
+        self.frame_allbtns = tk.Menu(self.frame_infomations, tearoff=0)
+        self.frame_allbtns.add_command(label="Start")
+        self.frame_allbtns.add_command(label="Pause", command=self.parent.pause)
+        
+        # Protection au cas où le modèle ne serait pas encore chargé
+        if hasattr(self.parent, 'modele'):
+            self.frame_allbtns.add_command(label="Start game", command=self.parent.modele.demarrePartie)
+
+        self.frame_options = tk.Button(self.frame_infomations, text="Game options", command=self.afficher_options)
+        self.frame_options.grid(row=0, column=4, sticky="ew", pady=10, padx=10)
+
+        self.btn_vague_automatique = tk.Button(self.frame_infomations, text="Vague automatique", bg="green")
+        self.btn_vague_automatique.grid(row=0, column=5, sticky="ew", pady=10, padx=10)
+        
+        # ---------------------------------------------------------
+        # 2. CANEVAS DU JEU (En bas à gauche - Ligne 1, Colonne 0)
+        # ---------------------------------------------------------
+        self.canevas = tk.Canvas(self.frame_principale, width=500, height=500, bg="black")
+        self.canevas.grid(row=1, column=0)
+        
+        # Le Try/Except empêche le jeu de crasher si l'image manque
+        try:
+            self.chemin1 = Image.open("Tours_2026/chemin1.png")
+            self.resize = self.chemin1.resize((500, 500), Image.Resampling.LANCZOS)
+            self.chmin_img = ImageTk.PhotoImage(self.resize)
+            self.canevas.create_image(0, 0, image=self.chmin_img, anchor=tk.NW)
+        except Exception as e:
+            print(f"Erreur de fond de carte: {e}")
+
+        # ---------------------------------------------------------
+        # 3. MENU DES TOURS (En bas à droite - Ligne 1, Colonne 1)
+        # ---------------------------------------------------------
+        self.frame_tours = tk.Frame(self.frame_principale, width=200, height=500, bg="#2e2f31")
+        self.frame_tours.grid_propagate(False) # Correction : False avec une majuscule
+        self.frame_tours.grid(row=1, column=1, sticky="nsew") # Changé à la colonne 1
+
+        chemin_routes = [
+            "images/tour1.png", "images/tour2.png", "images/tour3.png",
+            "images/tour4.png", "images/tour5.png", "images/tour6.png"
+        ]
+        
+        self.photo_tours = []
+        self.btns_tours = []
+
+        for i in range(len(chemin_routes)):
+            photo = self.resizeImages(chemin_routes[i], 50, 50)
+            
+            if photo:
+                self.photo_tours.append(photo)
+                btn = tk.Button(
+                    self.frame_tours, 
+                    image=photo, 
+                    command=lambda i=i: self.image_selectionne(i),
+                    borderwidth=0,
+                    bg="#999",
+                    activebackground="#777",
+                    cursor="hand2"
+                )
+                
+                # Calcule la ligne et la colonne (2 colonnes max)
+                lin = i // 2
+                col = i % 2
+                btn.grid(row=lin, column=col, padx=10, pady=10)
+    
+                self.btns_tours.append(btn)
+                setattr(self, f"btn_tour{i}", btn)
+
+        return self.frame_principale
 
 
 
-
+    def mettre_a_jour_informations(self):
+        if self.parent.modele.partie:
+            self.label_vie.config(text="vie: " + str(self.parent.modele.partie.vie))
+            self.label_argent.config(text="Argent: " + str(self.parent.modele.partie.cash))
+            self.label_niveau.config(text="Niveau: " + str(self.parent.modele.partie.nivo))
 
     def creer_splash(self):
         frame_splash = tk.Frame(self.root,bg ="#2e2f31" )
@@ -80,69 +172,6 @@ class Vue():
             return None
 
     def creer_boite_menu(self):
-        self.frame_tours = tk.Frame(self.frame_principale, width=200, height=500, bg="#2e2f31")
-        self.frame_tours.grid_propagate(FALSE)
-        self.frame_tours.grid(row=1, column=2, sticky="nsew")
-
-        chemin_routes = [
-            "images/tour1.png",
-            "images/tour2.png",
-            "images/tour3.png",
-            "images/tour4.png",
-            "images/tour5.png",
-            "images/tour6.png",
-
-        ]
-        
-        self.photo_tours = []
-        self.btns_tours = []
-
-        for i in range(len(chemin_routes)):
-            photo = self.resizeImages(chemin_routes[i], 50, 50)
-            
-            if photo:
-                self.photo_tours.append(photo)
-                # Creation btn
-                btn = tk.Button(
-                    self.frame_tours, 
-                    image=photo, 
-                    command= lambda i=i : self.image_selectionne(i),
-                    borderwidth=0,
-                    bg="#999",
-                    activebackground="#777",
-                    cursor="hand2"
-
-                )
-                lin = i // 2
-                col = i % 2
-                
-                btn.grid(row=lin, column=col, padx=10, pady=10)
-    
-                self.btns_tours.append(btn)
-                setattr(self, f"btn_tour{i}", btn)
-
-
-        
-        self.frame_infomations = tk.Frame(self.frame_principale,width=300, height=50, bg="#2e2f31")
-        self.frame_infomations.grid_propagate(False)
-        self.frame_infomations.grid(row=0, column=0,columnspan=3 ,sticky="nsew")
-
-        self.label_vie = tk.Label(self.frame_infomations, text="vie:" + str(self.parent.modele.partie.vie), fg="black", bg="#7D9EC0", font=("Arial", 12))
-        self.label_vie.grid(row=0,column=0,sticky="ew")
-        self.label_vie.grid(pady=10,padx=10)
-
-        self.label_argent = tk.Label(self.frame_infomations, text="Argent:" + str(self.parent.modele.partie.cash), fg="black", bg="#7D9EC0", font=("Arial", 12))
-        self.label_argent.grid(row=0,column=1,sticky="ew")
-        self.label_argent.grid(pady=10,padx=10)
-
-        self.label_score = tk.Label(self.frame_infomations, text="Score:" + str(0), fg="black", bg="#7D9EC0", font=("Arial", 12))
-        self.label_score.grid(row=0,column=2,sticky="ew")
-        self.label_score.grid(pady=10,padx=10)
-
-        self.label_niveau = tk.Label(self.frame_infomations, text="Niveau:" + str(self.parent.modele.partie.nivo), fg="black", bg="#7D9EC0", font=("Arial", 12))
-        self.label_niveau.grid(row=0,column=3,sticky="ew")
-        self.label_niveau.grid(pady=10,padx=10)
-        #pour le bouttons
         self.frame_allbtns = tk.Menu(self.frame_infomations,tearoff=0)
         self.frame_allbtns.add_command(label="Start")
         self.frame_allbtns.add_command(label="Pause", command=self.parent.pause)
