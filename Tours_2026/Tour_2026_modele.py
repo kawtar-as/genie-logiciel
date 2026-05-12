@@ -13,6 +13,19 @@ les Tours_2026 peuvent b�n�ficier d'ameliorations
 
 import random
 from helper import *
+
+# Dans ton modèle ou un fichier de constantes
+CONFIG_TOURS = {
+    "tour_0": {"prix": 0, "force": 2, "rayon": 15, "vitesse": 5},
+    "tour_1": {"prix": 20, "force": 5, "rayon": 20, "vitesse": 6},
+    "tour_2": {"prix": 40, "force": 5, "rayon": 20, "vitesse": 7},
+    "tour_3": {"prix": 80, "force": 5, "rayon": 25, "vitesse": 8},
+    "tour_4": {"prix": 100, "force": 5, "rayon": 30, "vitesse": 9},
+    "tour_5": {"prix": 175, "force": 7, "rayon": 30, "vitesse": 10},
+    
+    
+    # ... etc
+}
 class Parcours():
     def __init__(self):
         self.noeuds1=[[0,10],
@@ -55,15 +68,21 @@ class Emplacement():
 
 
 class Tour():
-    def __init__(self,parent,pos_x, pos_y):
+  
+    def __init__(self,parent,pos_x, pos_y,type):
         self.parent = parent
         self.pos_x = pos_x
         self.pos_y = pos_y
+        config = CONFIG_TOURS[type]
+        self.type = type
+        self.prix = config["prix"]
+        self.force = config["force"]
+        self.rayon = config["rayon"]
+        self.vitesse_tir = config["vitesse"]
         self.cible = [0,0]
-        self.vitesse_tir = 5
         self.rayon = 15
         self.projectile = []
-        self.force = 1
+        ## self.prix_tour 
         ##self.focus
         self.focus = self.parent.nivoActif.creepsEnCours[0]
 
@@ -248,13 +267,14 @@ class Nivo(): ##Vague
 class Partie():
     def __init__(self):
         self.vie=200
-        self.cash=250
+        self.cash=20
         self.creepparnivo=12
         self.creepforce=5
         self.nivo=0
         self.compteur = 0
         self.tours=[] # Tableau avec les TOURS
         self.prix_tour = [0,30,50,80,100,175]
+        self.price = 0
         # self.paused = False
     
     ## Initiation des attributs (Creation de un Niveau)
@@ -269,24 +289,14 @@ class Partie():
 
     ## Creation de UNE TOUR et on la rajoute dans le tableau
     ## setTour
-    def creerTour(self,pos_x,pos_y):
-        # on attribue a chaque tour son prix 
-        if len(self.tours) == 0:
-            self.prix_tour[0]
-        elif len(self.tours) == 1:
-            self.prix_tour[1]
-        elif len(self.tours) == 2:
-            self.prix_tour[2]
-        elif len(self.tours) == 3:
-            self.prix_tour[3]
-        elif len(self.tours) == 4:
-            self.prix_tour[4]
-        elif len(self.tours) == 5:
-            self.prix_tour[5]
-
-
-        if self.acheter_tour(self.prix): 
-            self.tours.append(Tour(self,pos_x,pos_y))
+    def creerTour(self,pos_x,pos_y,type_selectionne):
+       prix = CONFIG_TOURS[type_selectionne]["prix"]
+       if self.acheter_tour(prix): 
+            # On passe le type à l'objet Tour pour qu'il s'auto-configure
+            nouvelle_tour = Tour(self, pos_x, pos_y, type_selectionne)
+            self.tours.append(nouvelle_tour)
+            return True
+       return False
 
     ## ID pour les emplacements des carrées
     def creerId(self):
@@ -310,8 +320,11 @@ class Partie():
     def acheter_tour(self,prix):
             if self.cash >= prix:
                 self.cash -= prix
+                print( self.cash )
                 return True
-        
+            else:
+                print( self.cash )
+                return False
 
                   
     

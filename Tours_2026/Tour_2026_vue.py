@@ -132,7 +132,7 @@ class Vue():
                 btn.grid(row=lin, column=col, padx=10, pady=10)
     
                 self.btns_tours.append(btn)
-                setattr(self, f"btn_tour{i}", btn)
+                setattr(self, f"tour{i}", btn)
 
         return self.frame_principale
 
@@ -191,11 +191,10 @@ class Vue():
 
     def getPosTour(self, evt, x, y):
         if self.tour_active:
-            # On place l'image exactement aux coordonnées du centre de la case (x, y)
+            # On envoie la position ET le type au contrôleur
+            self.parent.setTour(x / 5, y / 5, self.type_en_cours)
+            # Optionnel : dessiner l'image
             self.canevas.create_image(x, y, image=self.tour_active, tags=("tour_img",))
-            
-            # On informe le contrôleur (on divise par 5 car ton modèle semble scaler par 5)
-            self.parent.setTour(x / 5, y / 5)
 
     def afficheModele(self):
         self.canevas.delete("all")
@@ -251,8 +250,8 @@ class Vue():
  
     def image_selectionne(self,i):
         self.tour_active = self.photo_tours[i]
-
-
+        # On mémorise la clé de la tour (ex: "tour0", "tour1"...)
+        self.type_en_cours = f"tour_{i}"
 
     
     # def pause(self,evt):

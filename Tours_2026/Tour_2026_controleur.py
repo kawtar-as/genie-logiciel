@@ -50,8 +50,8 @@ class Controleur():
             self.actif = 0
             print("Jeu en pause")
 
-    def setTour(self, pos_x,pos_y):
-        self.modele.partie.creerTour(pos_x,pos_y)
+    def setTour(self, pos_x,pos_y,selectionne):
+        self.modele.partie.creerTour(pos_x,pos_y,selectionne)
     
 
 if __name__ == '__main__':
