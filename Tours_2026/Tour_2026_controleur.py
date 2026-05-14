@@ -56,25 +56,8 @@ class Controleur():
             print("Jeu en pause")
 
     def setTour(self, pos_x,pos_y,selectionne):
-        return self.modele.partie.creerTour(pos_x,pos_y,selectionne)
-        
-    # En Tour_2026_controleur.py
-    def nouvelleVague(self):
-        if self.modele.partie:
-            if self.modele.partie.vagueTerminee():
-                self.modele.partie.initPartie() 
-                self.vue.mettre_a_jour_informations()
-            else:
-                print("partie encours, impossible de lancer une nouvelle vague")
-
-
-    def vagueAutomatique(self):
-        if self.vague_automatique == False:
-            self.vague_automatique = True
-            self.vue.btn_vague_automatique.config(bg="green", text="Auto: ON") 
-        else:
-            self.vague_automatique = False
-            self.vue.btn_vague_automatique.config(bg="red", text="Auto: OFF")
+        self.modele.partie.creerTour(pos_x,pos_y,selectionne)
+    
 
 if __name__ == '__main__':
     c = Controleur()

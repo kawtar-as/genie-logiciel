@@ -199,10 +199,9 @@ class Vue():
     def getPosTour(self, evt, x, y):
         if self.tour_active:
             # On envoie la position ET le type au contrôleur
-
-            if self.parent.setTour(x / 5, y / 5, self.type_en_cours):
+            self.parent.setTour(x / 5, y / 5, self.type_en_cours)
             # Optionnel : dessiner l'image
-                self.canevas.create_image(x, y, image=self.tour_active, tags=("tour_img",))
+            self.canevas.create_image(x, y, image=self.tour_active, tags=("tour_img",))
 
     def afficheModele(self):
         self.canevas.delete("all")
