@@ -325,7 +325,12 @@ class Partie():
             else:
                 print( self.cash )
                 return False
-
+    
+    def vagueTerminee(self):
+        if len(self.nivoActif.creeps) == 0 and len(self.nivoActif.creepsEnCours) == 0:  
+            return True
+        else: 
+            return False 
                   
     
     

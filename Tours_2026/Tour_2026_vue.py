@@ -183,18 +183,26 @@ class Vue():
         # lier le click avec le btnss
         self.frame_options.config(command=self.afficher_options)
 
-        self.btn_vague_automatique = tk.Button(self.frame_infomations, text = "vague automatique", bg="green")
+        self.btn_vague_automatique = tk.Button(self.frame_infomations, text = "vague automatique")
         self.btn_vague_automatique .grid(row=0,column=5,sticky="ew")
         self.btn_vague_automatique .grid(pady=10,padx=10)
+        self.btn_vague_automatique.config(command=self.parent.vagueAutomatique)
+
+
+        self.btn_next_vague = tk.Button(self.frame_infomations, text = "vague suivante", bg="orange")
+        self.btn_next_vague .grid(row=0,column=6,sticky="ew")
+        self.btn_next_vague .grid(pady=10,padx=10)
+        self.btn_next_vague.config(command= self.parent.nouvelleVague)
        
    
 
     def getPosTour(self, evt, x, y):
         if self.tour_active:
             # On envoie la position ET le type au contrôleur
-            self.parent.setTour(x / 5, y / 5, self.type_en_cours)
+
+            if self.parent.setTour(x / 5, y / 5, self.type_en_cours):
             # Optionnel : dessiner l'image
-            self.canevas.create_image(x, y, image=self.tour_active, tags=("tour_img",))
+                self.canevas.create_image(x, y, image=self.tour_active, tags=("tour_img",))
 
     def afficheModele(self):
         self.canevas.delete("all")

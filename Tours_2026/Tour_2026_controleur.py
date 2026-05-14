@@ -10,6 +10,7 @@ class Controleur():
         self.paused = True
         self.actif = 0
         self.delai = 50  # Vitesse du jeu
+        self.vague_automatique = False
 
     def demarrePartie(self):
         self.vue.changerFrame("principal")   
@@ -30,7 +31,11 @@ class Controleur():
 
     def continuePartie(self):
             if self.actif:
-              self.modele.partie.nivoActif.bougeCreep()
+                self.modele.partie.nivoActif.bougeCreep()
+                if self.vague_automatique:
+                    if self.modele.partie.vagueTerminee():
+                        self.nouvelleVague()
+
             for tour in self.modele.partie.tours:
                 tour.tirer()
             self.modele.partie.ajour_projectiles()
@@ -51,8 +56,25 @@ class Controleur():
             print("Jeu en pause")
 
     def setTour(self, pos_x,pos_y,selectionne):
-        self.modele.partie.creerTour(pos_x,pos_y,selectionne)
-    
+        return self.modele.partie.creerTour(pos_x,pos_y,selectionne)
+        
+    # En Tour_2026_controleur.py
+    def nouvelleVague(self):
+        if self.modele.partie:
+            if self.modele.partie.vagueTerminee():
+                self.modele.partie.initPartie() 
+                self.vue.mettre_a_jour_informations()
+            else:
+                print("partie encours, impossible de lancer une nouvelle vague")
+
+
+    def vagueAutomatique(self):
+        if self.vague_automatique == False:
+            self.vague_automatique = True
+            self.vue.btn_vague_automatique.config(bg="green", text="Auto: ON") 
+        else:
+            self.vague_automatique = False
+            self.vue.btn_vague_automatique.config(bg="red", text="Auto: OFF")
 
 if __name__ == '__main__':
     c = Controleur()
