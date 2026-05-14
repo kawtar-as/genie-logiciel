@@ -35,7 +35,6 @@ class Controleur():
                 if self.vague_automatique:
                     if self.modele.partie.vagueTerminee():
                         self.nouvelleVague()
-
             for tour in self.modele.partie.tours:
                 tour.tirer()
             self.modele.partie.ajour_projectiles()
@@ -56,8 +55,29 @@ class Controleur():
             print("Jeu en pause")
 
     def setTour(self, pos_x,pos_y,selectionne):
-        self.modele.partie.creerTour(pos_x,pos_y,selectionne)
-    
+        return self.modele.partie.creerTour(pos_x,pos_y,selectionne)
+        
+    # En Tour_2026_controleur.py
+    def nouvelleVague(self):
+        if self.modele.partie:
+            # Verificamos si todavía hay creeps en la cola o caminando por el mapa
+            creeps_manquants = len(self.modele.partie.nivoActif.creeps) > 0
+            creeps_vivants = len(self.modele.partie.nivoActif.creepsEnCours) > 0
+            
+            # Solo mandamos la ola si la anterior ya terminó por completo
+            if not creeps_manquants and not creeps_vivants:
+                self.modele.partie.initPartie() 
+                self.vue.mettre_a_jour_informations() 
+            else:
+                print("partie encours, impossible de lancer une nouvelle vague")
+
+    def vagueAutomatique(self):
+        if self.vague_automatique == False:
+            self.vague_automatique = True
+            self.vue.btn_vague_automatique.config(bg="green", text="Auto: ON") # Cambiamos color para dar feedback
+        else:
+            self.vague_automatique = False
+            self.vue.btn_vague_automatique.config(bg="red", text="Auto: OFF")
 
 if __name__ == '__main__':
     c = Controleur()
