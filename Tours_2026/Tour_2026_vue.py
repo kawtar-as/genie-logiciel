@@ -192,9 +192,12 @@ class Vue():
     def getPosTour(self, evt, x, y):
         if self.tour_active:
             # On envoie la position ET le type au contrôleur
-            self.parent.setTour(x / 5, y / 5, self.type_en_cours)
-            # Optionnel : dessiner l'image
-            self.canevas.create_image(x, y, image=self.tour_active, tags=("tour_img",))
+            canBuy = self.parent.setTour(x / 5, y / 5, self.type_en_cours)
+            if canBuy: # si l'argent est suffisnat 
+                self.canevas.create_image(x, y, image=self.tour_active, tags=("tour_img",))
+                print("tou achetée")
+            else:
+                print("non")
 
     def afficheModele(self):
         self.canevas.delete("all")
