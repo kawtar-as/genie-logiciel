@@ -17,22 +17,6 @@
 import random
 from helper import *
 
-
-# ====================================================================
-# CONFIGURATION DES TOURS
-# ====================================================================
-# Dictionnaire central qui regroupe toutes les caracteristiques de chaque
-# type de tour : prix, force d'attaque, rayon d'action, vitesse de tir.
-CONFIG_TOURS = {
-    "tour_0": {"prix": 0,   "force": 5, "rayon": 150, "vitesse": 5},
-    "tour_1": {"prix": 20,  "force": 5, "rayon": 20,  "vitesse": 6},
-    "tour_2": {"prix": 40,  "force": 5, "rayon": 20,  "vitesse": 7},
-    "tour_3": {"prix": 80,  "force": 5, "rayon": 25,  "vitesse": 8},
-    "tour_4": {"prix": 100, "force": 5, "rayon": 30,  "vitesse": 9},
-    "tour_5": {"prix": 175, "force": 7, "rayon": 30,  "vitesse": 10},
-}
-
-
 # ====================================================================
 # CLASSE PARCOURS
 # ====================================================================
@@ -82,6 +66,21 @@ class Emplacement():
         self.cases = [[100, 55],
                       [56, 150],
                       [161, 90]]
+
+
+# ====================================================================
+# CONFIGURATION DES TOURS
+# ====================================================================
+# Dictionnaire central qui regroupe toutes les caracteristiques de chaque
+# type de tour : prix, force d'attaque, rayon d'action, vitesse de tir.
+CONFIG_TOURS = {
+    "tour_0": {"prix": 0,   "force": 5, "rayon": 150, "vitesse": 5},
+    "tour_1": {"prix": 20,  "force": 5, "rayon": 20,  "vitesse": 6},
+    "tour_2": {"prix": 40,  "force": 5, "rayon": 20,  "vitesse": 1},
+    "tour_3": {"prix": 80,  "force": 5, "rayon": 25,  "vitesse": 8},
+    "tour_4": {"prix": 100, "force": 5, "rayon": 30,  "vitesse": 9},
+    "tour_5": {"prix": 175, "force": 7, "rayon": 30,  "vitesse": 10},
+}
 
 
 # ====================================================================
@@ -177,6 +176,20 @@ class Tour():
             self.cooldown = self.cooldown_max
 
 
+class TourLaser(Tour):
+    def __init__(self, parent, pos_x, pos_y, type):
+        super().__init__(parent, pos_x, pos_y, type)
+    
+    def tirer(self):
+        if self.focus:
+            self.focus.creep_vie -= self.force
+            
+    
+
+    
+
+    
+
 # ====================================================================
 # CLASSE MISSILE
 # ====================================================================
@@ -227,11 +240,6 @@ class Missile():
 # ====================================================================
 # Ennemi qui parcourt le chemin pour atteindre la base du joueur.
 class Creep():
-
-    # ----------------------------------------------------------------
-    # INITIALISATION
-    # ----------------------------------------------------------------
-
     def __init__(self, parent):
         self.parent = parent
         self.pos = self.parent.parcours.noeuds[0][:]
@@ -255,17 +263,11 @@ class Creep():
             else:
                 self.dir = -1
 
-    # ----------------------------------------------------------------
-    # ACCESSEURS
-    # ----------------------------------------------------------------
 
     # Retourne la position actuelle du creep
     def getPosition(self):
         return self.pos[0], self.pos[1]
 
-    # ----------------------------------------------------------------
-    # DEPLACEMENT
-    # ----------------------------------------------------------------
 
     # Deplace le creep le long du chemin vers le prochain noeud
     def bouge(self):
@@ -290,9 +292,6 @@ class Creep():
             nouv_x, nouv_y = Helper.getAngledPoint(angle, self.vitesse, curr_x, curr_y)
             self.pos = [nouv_x, nouv_y]
 
-    # ----------------------------------------------------------------
-    # IMPACT SUR LE JOUEUR
-    # ----------------------------------------------------------------
 
     # Le creep atteint la fin : retire de la vie au joueur
     def perdre_vie_joueur(self, valeur=1):

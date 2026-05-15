@@ -250,6 +250,8 @@ class Vue():
                 my2 = m.y * 5 + m.taille
                 self.canevas.create_rectangle(mx1, my1, mx2, my2,
                                               fill="yellow", tags=("missile",))
+        
+        
 
     # ================================================================
     # MENUS & INTERACTIONS
