@@ -16,7 +16,7 @@ from helper import *
 
 # Dans ton modèle ou un fichier de constantes
 CONFIG_TOURS = {
-    "tour_0": {"prix": 0, "force": 2, "rayon": 15, "vitesse": 5},
+    "tour_0": {"prix": 0, "force": 5, "rayon": 150, "vitesse": 5},
     "tour_1": {"prix": 20, "force": 5, "rayon": 20, "vitesse": 6},
     "tour_2": {"prix": 40, "force": 5, "rayon": 20, "vitesse": 7},
     "tour_3": {"prix": 80, "force": 5, "rayon": 25, "vitesse": 8},
@@ -68,8 +68,7 @@ class Emplacement():
 
 
 class Tour():
-  
-    def __init__(self,parent,pos_x, pos_y,type):
+    def __init__(self, parent, pos_x, pos_y, type):
         self.parent = parent
         self.pos_x = pos_x
         self.pos_y = pos_y
@@ -77,62 +76,61 @@ class Tour():
         self.type = type
         self.prix = config["prix"]
         self.force = config["force"]
-        self.rayon = config["rayon"]
+        self.rayon = config["rayon"]           # rayon depuis la config (NE PAS écraser)
         self.vitesse_tir = config["vitesse"]
-        self.cible = [0,0]
-        self.rayon = 15
         self.projectile = []
-        ## self.prix_tour 
-        ##self.focus
-        self.focus = self.parent.nivoActif.creepsEnCours[0]
+
+        # --- Focus / cible ---
+        self.focus = None                       # creep actuellement visé (ou None)
+
+        # --- Cadence de tir ---
+        self.cooldown = 0                       # ticks restants avant le prochain tir
+        self.cooldown_max = 10                  # ex: 20 ticks ≈ 1 seconde si delai=50ms
 
     def getPosition(self):
         return self.pos_x, self.pos_y
-    
-    def creepInRTour(self, tour):
-         self.creepInRTour = []
-         xTour, yTour = tour.getPosition() 
 
-         for creep in self.creepsEnCours:
-             xCreep, yCreep = creep.getPosition() # PRENDRE LA POSITION DU CREEP X,Y
-             deltax = self.diference(xTour, xCreep)
-             deltaY = self.diference(yTour, yCreep)
-             if (deltax <= tour.rayon and deltaY <= tour.rayon):
-                print("creep dans le rayon")
-                 ## le tag du creep rajouter au tableau de la tour. 
-                tour.CreepsInTour.append(creep)
-                return len(self.CreepsInTour) > 0
-             
+    def creep_a_portee(self, creep):
+        """Vrai si le creep est dans le rayon de la tour."""
+        dist = Helper.calcDistance(self.pos_x, self.pos_y,
+                                   creep.pos[0], creep.pos[1])
+        return dist <= self.rayon
 
-    def diference(self, n1, n2):
-        return abs(abs(n1)-abs(n2))
-           
-   
+    def chercher_cible(self):
+        """Cherche le premier creep à portée et le fixe comme focus."""
+        for creep in reversed(self.parent.nivoActif.creepsEnCours):
+            if creep.creep_vie > 0 and self.creep_a_portee(creep):
+                self.focus = creep
+                return
+        self.focus = None
+
     def tirer(self):
-        # On cherche s'il y a des creeps 
-        creeps_a_portee = []
-        for creep in self.parent.nivoActif.creepsEnCours:
-            dist = Helper.calcDistance(self.pos_x, self.pos_y, creep.pos[0], creep.pos[1])
-            if dist <= self.rayon:
-                creeps_a_portee.append(creep)
+        # 1) Décrémenter le cooldown
+        if self.cooldown > 0:
+            self.cooldown -= 1
 
-        if creeps_a_portee:
-            # On cible le premier creep trouvé
-            cible = creeps_a_portee[0]
-            # Création du missile
-            nouveau_missile = Missile(self.pos_x, self.pos_y, self.vitesse_tir, self.force, 2)
-            nouveau_missile.cible_x = cible.pos[0]
-            nouveau_missile.cible_y = cible.pos[1]
-            self.projectile.append(nouveau_missile)
-    
-      
-    def parcourToursPourTirer(self):
-        self.tirer()
+        # 2) Vérifier que le focus actuel est toujours valable
+        focus_valide = (
+            self.focus is not None
+            and self.focus in self.parent.nivoActif.creepsEnCours
+            and self.focus.creep_vie > 0
+            and self.creep_a_portee(self.focus)
+        )
 
-    
-                
+        # 3) Si plus de focus valable, en chercher un nouveau
+        if not focus_valide:
+            self.chercher_cible()
 
-    
+        # 4) Tirer si on a une cible ET que le cooldown est fini
+        if self.focus is not None and self.cooldown == 0:
+            missile = Missile(self.pos_x, self.pos_y,
+                              self.vitesse_tir, self.force, 2)
+            missile.cible_creep = self.focus    # référence directe au creep
+            missile.cible_x = self.focus.pos[0]
+            missile.cible_y = self.focus.pos[1]
+            self.projectile.append(missile)
+            self.cooldown = self.cooldown_max
+
 
 class Missile():
     def __init__(self, x, y, vitesse, dmg, taille):
@@ -141,19 +139,36 @@ class Missile():
         self.vitesse = vitesse
         self.dmg = dmg
         self.taille = taille
-        self.cible_x =0
-        self.cible_y =0
-    def bouger_misile(self, creep) :
-        #éplace le missile vers destination
+        self.cible_x = 0
+        self.cible_y = 0
+        self.cible_creep = None                 # référence au creep visé
+
+    def bouger_misile(self):
+        """Le missile suit le creep en mouvement. Retourne True s'il touche."""
+        # 1) Cible perdue (morte ou sortie du chemin) → le missile s'auto-détruit
+        if self.cible_creep is None or self.cible_creep.creep_vie <= 0:
+            return True
+        
+        # 2) On vérifie aussi qu'elle est encore dans la partie
+        if self.cible_creep not in self.cible_creep.parent.creepsEnCours:
+            return True
+        
+        # 3) Cible toujours valide : on la suit
+        self.cible_x = self.cible_creep.pos[0]
+        self.cible_y = self.cible_creep.pos[1]
+
         dist = Helper.calcDistance(self.x, self.y, self.cible_x, self.cible_y)
+
         if dist > self.vitesse:
             angle = Helper.calcAngle(self.x, self.y, self.cible_x, self.cible_y)
             self.x, self.y = Helper.getAngledPoint(angle, self.vitesse, self.x, self.y)
+            return False
         else:
-            # Le missile a atteint sa cible
+            # Impact : infliger les dégâts
             self.x, self.y = self.cible_x, self.cible_y
-            return True # Signale qu'il a touché
-        return False
+            self.cible_creep.creep_vie -= self.dmg
+            return True
+
 
 
 class Creep():
@@ -256,11 +271,13 @@ class Nivo(): ##Vague
         for i in self.creepsEnCours:
             n=n+1
             i.bouge()
+            #delete creep si pas de vie
+            if(i.creep_vie <= 0):
+                self.creepsEnCours.remove(i)
             if(i.cible >= len(self.parcours.noeuds)):
                 self.creepsEnCours.remove(i)
 
     def nextVague(self):
-        
         return True
               
 
@@ -268,7 +285,7 @@ class Partie():
     def __init__(self):
         self.vie=200
         self.cash=20
-        self.creepparnivo=12
+        self.creepparnivo=5
         self.creepforce=5
         self.nivo=0
         self.compteur = 0
@@ -309,7 +326,7 @@ class Partie():
     def ajour_projectiles(self):
         for t in self.tours:
             for m in t.projectile[:]: 
-                touche = m.bouger_misile(None) 
+                touche = m.bouger_misile() 
                 if touche:
                     t.projectile.remove(m)
 

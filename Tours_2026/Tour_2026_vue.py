@@ -196,7 +196,7 @@ class Vue():
        
    
 
-    def getPosTour(self, evt, x, y):
+    def creerTour(self, evt, x, y):
         if self.tour_active:
 
             # On envoie la position ET le type au contrôleur
@@ -217,7 +217,7 @@ class Vue():
         for i in self.parent.modele.partie.nivoActif.emplacement.cases:
             id = self.parent.modele.partie.creerId()
             self.canevas.create_rectangle((i[0] - 10) * 2, (i[1] - 10) * 2 , (i[0] + 10) * 2 , (i[1] + 10) * 2, fill="black", tags=("cases", id))
-            self.canevas.tag_bind(id, "<Button-1>", lambda event, x=i[0]*2, y=i[1]*2 : self.getPosTour(event, x, y))
+            self.canevas.tag_bind(id, "<Button-1>", lambda event, x=i[0]*2, y=i[1]*2 : self.creerTour(event, x, y))
 
     def afficheCreepTourBombe(self):
         self.canevas.delete("creep")
