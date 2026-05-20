@@ -80,8 +80,14 @@ CONFIG_TOURS = {
     "tour_3": {"prix": 80,  "force": 5, "rayon": 25,  "vitesse": 8},
     "tour_4": {"prix": 100, "force": 5, "rayon": 30,  "vitesse": 9},
     "tour_5": {"prix": 175, "force": 7, "rayon": 30,  "vitesse": 10},
+} 
+# pour les creep
+CONFIG_CREEPS = {
+    "creep_normal": {"vie": 10,  "vitesse": 2, "force": 10},
+    "creep_rapide": {"vie": 6,   "vitesse": 4, "force": 5},
+    "creep_fort":   {"vie": 40,  "vitesse": 1, "force": 20},
+    "creep_boss":   {"vie": 150, "vitesse": 0.8, "force": 50},
 }
-
 
 # ====================================================================
 # CLASSE TOUR
@@ -98,21 +104,15 @@ class Tour():
         self.parent = parent
         self.pos_x = pos_x
         self.pos_y = pos_y
-
-        # Lecture de la configuration selon le type de tour
         config = CONFIG_TOURS[type]
         self.type = type
         self.prix = config["prix"]
         self.force = config["force"]
         self.rayon = config["rayon"]
         self.vitesse_tir = config["vitesse"]
-
-        # Liste des projectiles actifs tires par cette tour
-        self.projectile = []
-
         # Cible actuellement visee
         self.focus = None
-
+        self.projectile = []
         # Cadence de tir (en ticks)
         self.cooldown = 0
         self.cooldown_max = 10        # ex: 20 ticks = 1 seconde si delai=50ms
@@ -184,11 +184,46 @@ class TourLaser(Tour):
         if self.focus:
             self.focus.creep_vie -= self.force
             
-    
+class TourNormale(Tour):
+    def __init__(self, parent, pos_x, pos_y, type_tour="tour_1"):
+        super().__init__(parent, pos_x, pos_y, type_tour)  
 
-    
+    def tirer(self):
+        super().tirer()
 
-    
+class TourCrazy(Tour):
+    def __init__(self, parent, pos_x, pos_y, type_tour="tour_1"):
+        super().__init__(parent, pos_x, pos_y, type_tour)  
+
+    def tirer(self):
+        if self.focus:
+            self.focus.creep_vie -= self.force
+   
+
+class TourJsp(Tour):
+    def __init__(self, parent, pos_x, pos_y, type_tour="tour_1"):
+        super().__init__(parent, pos_x, pos_y, type_tour)  
+
+    def tirer(self):
+        if self.focus:
+            self.focus.creep_vie -= self.force
+
+class TourIDK(Tour):
+    def __init__(self, parent, pos_x, pos_y, type_tour="tour_1"):
+        super().__init__(parent, pos_x, pos_y, type_tour)  
+
+    def tirer(self):
+        if self.focus:
+            self.focus.creep_vie -= self.force
+
+class TourAllo(Tour):
+    def __init__(self, parent, pos_x, pos_y, type_tour="tour_1"):
+        super().__init__(parent, pos_x, pos_y, type_tour)  
+
+    def tirer(self):
+        if self.focus:
+            self.focus.creep_vie -= self.force
+
 
 # ====================================================================
 # CLASSE MISSILE
@@ -240,7 +275,7 @@ class Missile():
 # ====================================================================
 # Ennemi qui parcourt le chemin pour atteindre la base du joueur.
 class Creep():
-    def __init__(self, parent):
+    def __init__(self, parent,type_creep="creep_normal"):
         self.parent = parent
         self.pos = self.parent.parcours.noeuds[0][:]
         self.cible = 1               # Indice du prochain noeud a atteindre
@@ -248,6 +283,7 @@ class Creep():
         self.force = 10
         self.creep_vie = 10
         self.axe = 0
+        config = CONFIG_CREEPS[type_creep]
 
         # Determination de l'axe et de la direction initiale de deplacement
         if self.pos[0] != self.parent.parcours.noeuds[1][0]:
@@ -298,6 +334,25 @@ class Creep():
         self.parent.parent.vie -= valeur
         print(self.parent.parent.vie)
 
+class CreepNormal(Creep):
+    def __init__(self, parent):
+        super().__init__(parent, "creep_normal")
+
+
+class CreepRapide(Creep):
+    def __init__(self, parent):
+        super().__init__(parent, "creep_rapide")
+
+
+class CreepFort(Creep):
+    def __init__(self, parent):
+        super().__init__(parent, "creep_fort")
+
+
+class CreepBoss(Creep):
+    def __init__(self, parent):
+        super().__init__(parent, "creep_boss") # Utilise les stats de base
+        
 
 # ====================================================================
 # CLASSE NIVO (VAGUE)
@@ -333,8 +388,11 @@ class Nivo():
 
     # Cree tous les creeps de la vague
     def creeCreep(self):
+        liste_creep = [CreepNormal, CreepRapide, CreepFort, CreepBoss]
         for i in range(self.parent.creepparnivo):
-            self.creeps[self.creerId()] = Creep(self)
+            # a regler est ce que on veut random ou on choisi
+            classeChoisie = liste_creep[0] # par defaut c esst normal
+            self.creeps[self.creerId()] = classeChoisie(self)
 
     # ----------------------------------------------------------------
     # GESTION DU MOUVEMENT EN VAGUE
@@ -428,9 +486,19 @@ class Partie():
     def creerTour(self, pos_x, pos_y, type_selectionne):
         prix = CONFIG_TOURS[type_selectionne]["prix"]
         if self.acheter_tour(prix):
-            nouvelle_tour = Tour(self, pos_x, pos_y, type_selectionne)
-            self.tours.append(nouvelle_tour)
-            return True
+           dictionnaire_tours = {
+                "tour_0": TourNormale,
+                "tour_1": TourLaser,
+                "tour_2": TourCrazy,
+                "tour_3": TourJsp,
+                "tour_4": TourIDK,
+                "tour_5": TourAllo
+            }
+           
+           classeChoisie = dictionnaire_tours.get(type_selectionne, TourNormale)
+           nouvelle_tour = classeChoisie(self, pos_x, pos_y, type_selectionne)
+           self.tours.append(nouvelle_tour)
+           return True
         return False
 
     # Fait tirer toutes les tours

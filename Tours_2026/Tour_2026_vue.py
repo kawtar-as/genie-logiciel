@@ -284,18 +284,49 @@ class Vue():
                                         text="vague suivante", bg="orange")
         self.btn_next_vague.grid(row=0, column=6, sticky="ew", pady=10, padx=10)
         self.btn_next_vague.config(command=self.parent.nouvelleVague)
-
+    
     # Affiche le menu d'options sous le bouton "Game options"
     def afficher_options(self):
         x = self.frame_options.winfo_rootx()
         y = self.frame_options.winfo_rooty()
         self.frame_allbtns.post(x, y)
 
+   
     # Memorise la tour choisie par le joueur dans le menu
     def image_selectionne(self, i):
         self.tour_active = self.photo_tours[i]
         self.type_en_cours = f"tour_{i}"
+        self.creer_powerUp()
+        self.creer_notification(message = "vous avez chosi une tour !")
 
+    def creer_powerUp(self):
+        if hasattr(self, 'frame_powers') and self.frame_powers:
+            self.frame_powers.destroy()
+
+        
+        self.frame_powers = tk.Frame(self.frame_tours, width=180, height=150, bg="#2e2f31")
+        self.frame_powers.grid_propagate(False)
+        self.frame_powers.grid(row=4, column=0, columnspan=2, sticky="ew", pady=10)
+
+        lbl_titre = tk.Label(self.frame_powers, text="POWER-UPS", fg="#99AAB5", bg="#2e2f31", font=("Arial", 11, "bold"))
+        lbl_titre.pack(pady=5,padx=10)
+            # on doit ajouter les commandes pour les powerups 
+        btn_portee = tk.Button(self.frame_powers, text="+ FORCE", bg="#7289DA", fg="white")
+        btn_portee.pack(fill="x",padx=10, pady=5)
+
+        btn_degat = tk.Button(self.frame_powers, text="+ RAYON", bg="#7289DA", fg="white")
+        btn_degat.pack(fill="x",padx=10, pady=5)
+
+    def creer_notification(self,message):
+        if hasattr(self, 'frame_notification') and self.frame_notification:
+            self.frame_notification.destroy()
+        self.frame_notification = tk.Frame(self.frame_tours,
+                                    width=150, height=50, bg="#dd2108")
+        self.frame_notification.grid_propagate(False)
+        self.frame_notification.grid(row=3, column=0, columnspan=2, sticky="ew", pady=5,padx=10)
+
+        lbl_message = tk.Label(self.frame_notification, text=message,fg = "black", font=("Arial", 11, "bold"))
+        lbl_message.pack(expand=True, fill="both")
     # Place une tour sur le canevas en cas de clic sur une case
     def creerTour(self, evt, x, y):
         if self.tour_active:
