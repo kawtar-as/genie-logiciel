@@ -128,9 +128,23 @@ class Controleur():
         
         if tour_cliquee:
             # L'objet retourné est la véritable instance de Tour (ou TourLaser, etc.)
+            
             print(f"Succès : Vous avez cliqué sur une tour de type {tour_cliquee.type} !")
             print(f"Force : {tour_cliquee.force} | Rayon : {tour_cliquee.rayon}")
 
+            return tour_cliquee
+
+   
+    def powerUpRayon(self):
+        self.modele.partie.changerRayonTour()
+        self.vue.rafraichir_notification_tour()
+
+    def getTagTour(self):
+        return self.modele.partie.tourActuelle.type
+
+    def powerUpForce(self):
+        self.modele.partie.changerForceTour()
+        self.vue.rafraichir_notification_tour()
 
 # ====================================================================
 # POINT D'ENTREE

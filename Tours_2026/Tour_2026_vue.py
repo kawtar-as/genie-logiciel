@@ -283,8 +283,8 @@ class Vue():
         self.btn_next_vague = tk.Button(self.frame_infomations,
                                         text="vague suivante", bg="orange")
         self.btn_next_vague.grid(row=0, column=6, sticky="ew", pady=10, padx=10)
-        self.btn_next_vague.config(command=self.parent.nouvelleVague)
-    
+        self.btn_next_vague.config(command= self.parent.nouvelleVague)
+        
     # Affiche le menu d'options sous le bouton "Game options"
     def afficher_options(self):
         x = self.frame_options.winfo_rootx()
@@ -297,7 +297,10 @@ class Vue():
         self.tour_active = self.photo_tours[i]
         self.type_en_cours = f"tour_{i}"
         self.creer_powerUp()
-        self.creer_notification(message = "vous avez chosi une tour !")
+        message_notif = f"Tour selectionnee : {self.type_en_cours}"
+        self.creer_notification(message=message_notif)
+        
+       
 
     def creer_powerUp(self):
         if hasattr(self, 'frame_powers') and self.frame_powers:
@@ -308,15 +311,17 @@ class Vue():
         self.frame_powers.grid_propagate(False)
         self.frame_powers.grid(row=4, column=0, columnspan=2, sticky="ew", pady=10)
 
-        lbl_titre = tk.Label(self.frame_powers, text="POWER-UPS", fg="#99AAB5", bg="#2e2f31", font=("Arial", 11, "bold"))
-        lbl_titre.pack(pady=5,padx=10)
+        self.lbl_titre = tk.Label(self.frame_powers, text="POWER-UPS", fg="#99AAB5", bg="#2e2f31", font=("Arial", 11, "bold"))
+        self.lbl_titre.pack(pady=5,padx=10)
             # on doit ajouter les commandes pour les powerups 
-        btn_portee = tk.Button(self.frame_powers, text="+ FORCE", bg="#7289DA", fg="white")
-        btn_portee.pack(fill="x",padx=10, pady=5)
+        self.btn_portee = tk.Button(self.frame_powers, text="+ FORCE (20$)", bg="#7289DA", fg="white")
+        self.btn_portee.pack(fill="x",padx=10, pady=5)
+        self.btn_portee.config(command=self.parent.powerUpForce)
 
-        btn_degat = tk.Button(self.frame_powers, text="+ RAYON", bg="#7289DA", fg="white")
-        btn_degat.pack(fill="x",padx=10, pady=5)
-
+        self.btn_degat = tk.Button(self.frame_powers, text="+ RAYON (20$)", bg="#7289DA", fg="white")
+        self.btn_degat.pack(fill="x",padx=10, pady=5)
+        self.btn_degat.config(command=self.parent.powerUpRayon)
+    
     def creer_notification(self,message):
         if hasattr(self, 'frame_notification') and self.frame_notification:
             self.frame_notification.destroy()
@@ -337,6 +342,14 @@ class Vue():
                 
                 self.canevas.tag_bind("tour_img", "<Button-1>", self.cliquer_tour)
 
+    def rafraichir_notification_tour(self):
+        # On va chercher la tour actuellement sélectionnée dans le modèle
+        tour = self.parent.modele.partie.tourActuelle
+        if tour:
+            # On recrée le message avec les nouvelles statistiques mises à jour
+            noti = f"Type: {tour.type}\nForce: {tour.force} | Rayon: {tour.rayon}"
+            self.creer_notification(message=noti)
+
     def cliquer_tour(self, evt):
         # "current" est un tag spécial de Tkinter qui cible l'élément sous la souris
         item_cible = self.canevas.find_withtag("current")[0]
@@ -347,8 +360,15 @@ class Vue():
         y_canevas = coords[1]
         
         # On reconvertit les coordonnées pour le Modèle (divisé par 5) et on l'envoie au Contrôleur
-        self.parent.clic_tour_existante(x_canevas / 5, y_canevas / 5)
+        self.tour_touve = self.parent.clic_tour_existante(x_canevas / 5, y_canevas / 5)
 
+        self.rafraichir_notification_tour()
+
+
+    
+
+    
+       
     # ================================================================
     # OUTILS
     # ================================================================
