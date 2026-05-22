@@ -16,7 +16,7 @@
 
 import random
 from helper import *
-
+import csv
 # ====================================================================
 # CLASSE PARCOURS
 # ====================================================================
@@ -505,7 +505,7 @@ class Partie():
     # ----------------------------------------------------------------
 
     def __init__(self):
-        self.vie = 200
+        self.vie = 10
         self.cash = 250
         self.creepparnivo = 10
         self.creepforce = 5
@@ -625,8 +625,32 @@ class Partie():
             return True
         else:
             return False
+    def sauvegarder(self,valeur):
+        with open("fichier.csv", mode="a", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow([valeur, self.score])
 
+    
+    def sauvegarder_score_csv(self,nom_joueur):
+        
+        fichier = "scores.csv"
+        score_calcule = (self.nivo * 100) + self.cash
+        
+        # Écrit le nom et le score
+        with open(fichier, 'a', newline='', encoding='UTF-8') as f:
+            writer = csv.writer(f)
+            writer.writerow([nom_joueur, score_calcule])
+        print("✓ Score sauvegardé dans scores.csv")
 
+    def verifier_game_over(self):
+        # Condition 1 : Vie <= 0 (défaite)
+        if self.vie <= 0:
+            return True, 
+        # Condition 2 : Niveau 15 atteint (victoire)
+        if self.nivo >= 2:
+            return True, 
+        
+        return False, None
 # ====================================================================
 # CLASSE MODELE
 # ====================================================================

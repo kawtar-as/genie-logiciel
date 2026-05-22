@@ -364,6 +364,22 @@ class Vue():
 
         self.rafraichir_notification_tour()
 
+    def game_over(self):
+        if hasattr(self, 'frame_game_over' )and self.frame_game_over:
+            self.frame_game_over.destroy()
+        
+        self.frame_game_over = tk.Frame(self.frame_principale, bg="#1a1a1a")
+        self.frame_game_over.grid(row=0, column=0, rowspan=2, columnspan=2, sticky="nsew")
+        
+        lbl_title = tk.Label(self.frame_game_over, text="GAME OVER", 
+                            font=("Arial", 40, "bold"), fg="red", bg="#1a1a1a")
+        lbl_title.pack(pady=50)
+        
+        # Bouton quitter
+        btn_quitter = tk.Button(self.frame_game_over, text="Quitter",
+                                command=self.root.quit,
+                                font=("Arial", 15), bg="red", fg="white")
+        btn_quitter.pack(pady=10)
 
     
 
