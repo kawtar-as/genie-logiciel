@@ -428,6 +428,7 @@ class Nivo():
             i.bouge()
             if i.creep_vie <= 0:
                 self.creepsEnCours.remove(i)
+                self.parent.cash += 25
             if i.cible >= len(self.parcours.noeuds):
                 self.creepsEnCours.remove(i)
 
