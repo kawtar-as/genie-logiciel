@@ -452,7 +452,7 @@ class Partie():
 
     def __init__(self):
         self.vie = 200
-        self.cash = 20
+        self.cash = 200
         self.creepparnivo = 10
         self.creepforce = 5
         self.nivo = 0
@@ -460,6 +460,8 @@ class Partie():
         self.tours = []              # Toutes les tours posees
         self.prix_tour = [0, 30, 50, 80, 100, 175]
         self.price = 0
+
+        self.tourActuelle = 0
 
     # Initialise un nouveau niveau / vague
     def initPartie(self):
@@ -506,6 +508,7 @@ class Partie():
         for tour in self.tours:
             # On cherche la correspondance parfaite des coordonnées
             if tour.pos_x == pos_x and tour.pos_y == pos_y:
+                self.tourActuelle = tour
                 return tour
         return None
 
@@ -513,6 +516,24 @@ class Partie():
     def toursTirent(self):
         for tour in self.tours:
             tour.tirer()
+
+    def changerRayonTour(self):
+        cout_upgrade = 20
+        if self.tourActuelle and self.cash >= cout_upgrade:
+            self.cash -= cout_upgrade
+            self.tourActuelle.rayon += 10
+            print(f"Rayon améliorée ! Reste {self.cash} argent.")
+        else:
+            print("Pas de tour sélectionnée ou pas assez d'argent !")
+
+    def changerForceTour(self):
+        cout_upgrade = 20
+        if self.tourActuelle and self.cash >= cout_upgrade:
+            self.cash -= cout_upgrade
+            self.tourActuelle.force += 10
+            print(f"Force améliorée ! Reste {self.cash} argent.")
+        else:
+            print("Pas de tour sélectionnée ou pas assez d'argent !")
 
     # ----------------------------------------------------------------
     # GESTION DES PROJECTILES
