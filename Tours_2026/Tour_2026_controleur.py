@@ -58,7 +58,6 @@ class Controleur():
         partie = self.modele.partie
         if partie and partie.nivoActif:
             self.modele.partie.nivoActif.bougeCreep()
-
             # Lancement automatique de la prochaine vague si activee
             if self.vague_automatique:
                 if partie.vagueTerminee():
