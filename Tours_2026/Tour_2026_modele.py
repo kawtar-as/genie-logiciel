@@ -553,6 +553,14 @@ class Partie():
            self.tours.append(nouvelle_tour)
            return True
         return False
+    
+    # Parcourt la liste des tours pour trouver celle aux coordonnées demandées
+    def trouver_tour(self, pos_x, pos_y):
+        for tour in self.tours:
+            # On cherche la correspondance parfaite des coordonnées
+            if tour.pos_x == pos_x and tour.pos_y == pos_y:
+                return tour
+        return None
 
     # Fait tirer toutes les tours
     def toursTirent(self):
