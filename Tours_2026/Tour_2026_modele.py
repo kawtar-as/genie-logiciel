@@ -22,36 +22,53 @@ from helper import *
 # ====================================================================
 # Definit les chemins (suite de noeuds) que les creeps doivent suivre.
 class Parcours():
-
-    def __init__(self):
+    def __init__(self, choix_carte=1):
         # Premier parcours simple
-        self.noeuds1 = [[0, 10],
-                        [50, 10],
-                        [50, 80],
-                        [100, 80]]
+        self.noeuds1 = [[0, 10], [50, 10], [50, 80], [100, 80]]
 
         # Deuxieme parcours plus complexe
-        self.noeuds2 = [[0, 10],
-                        [20, 10],
-                        [20, 40],
-                        [50, 40],
-                        [50, 20],
-                        [80, 20],
-                        [80, 60],
-                        [30, 60],
-                        [30, 80],
-                        [100, 80]]
+        self.noeuds2 = [[0, 10], [20, 10], [20, 40], [50, 40], [50, 20], [80, 20], [80, 60], [30, 60], [30, 80], [100, 80]]
 
-        # Parcours actif utilise dans la partie
-        self.noeuds = [[0, 0],
-                       [22, 35],
-                       [53, 35],
-                       [53, 23],
-                       [75, 23],
-                       [75, 55],
-                       [33, 55],
-                       [33, 77],
-                       [100, 77]]
+        # Troisieme parcours (l'ancien parcours par defaut)
+        self.noeuds3 = [[0, 0], [22, 35], [53, 35], [53, 23], [75, 23], [75, 55], [33, 55], [33, 77], [100, 77]]
+
+        # Assignation du parcours actif selon le choix
+        if choix_carte == 1:
+            self.noeuds = self.noeuds1
+        elif choix_carte == 2:
+            self.noeuds = self.noeuds2
+        else:
+            self.noeuds = self.noeuds3
+
+    # def __init__(self):
+    #     # Premier parcours simple
+    #     self.noeuds1 = [[0, 10],
+    #                     [50, 10],
+    #                     [50, 80],
+    #                     [100, 80]]
+
+    #     # Deuxieme parcours plus complexe
+    #     self.noeuds2 = [[0, 10],
+    #                     [20, 10],
+    #                     [20, 40],
+    #                     [50, 40],
+    #                     [50, 20],
+    #                     [80, 20],
+    #                     [80, 60],
+    #                     [30, 60],
+    #                     [30, 80],
+    #                     [100, 80]]
+
+    #     # Parcours actif utilise dans la partie
+    #     self.noeuds = [[0, 0],
+    #                    [22, 35],
+    #                    [53, 35],
+    #                    [53, 23],
+    #                    [75, 23],
+    #                    [75, 55],
+    #                    [33, 55],
+    #                    [33, 77],
+    #                    [100, 77]]
 
 
 # ====================================================================
@@ -366,7 +383,7 @@ class Nivo():
 
     def __init__(self, parent):
         self.parent = parent
-        self.parcours = Parcours()
+        self.parcours = Parcours(self.parent.carteActive)
         self.emplacement = Emplacement()
         self.densiteCreep = 3
         self.creeps = {}             # Creeps en attente
@@ -453,7 +470,7 @@ class Partie():
 
     def __init__(self):
         self.vie = 200
-        self.cash = 200
+        self.cash = 20
         self.creepparnivo = 10
         self.creepforce = 5
         self.nivo = 0
@@ -461,8 +478,9 @@ class Partie():
         self.tours = []              # Toutes les tours posees
         self.prix_tour = [0, 30, 50, 80, 100, 175]
         self.price = 0
-
         self.tourActuelle = 0
+        ## chemin
+        self.carteActive = 3
 
     # Initialise un nouveau niveau / vague
     def initPartie(self):

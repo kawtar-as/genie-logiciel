@@ -320,6 +320,7 @@ class Vue():
 
         self.btn_degat = tk.Button(self.frame_powers, text="+ RAYON (20$)", bg="#7289DA", fg="white")
         self.btn_degat.pack(fill="x",padx=10, pady=5)
+        
         self.btn_degat.config(command=self.parent.powerUpRayon)
     
     def creer_notification(self,message):
