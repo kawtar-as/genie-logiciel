@@ -113,6 +113,15 @@ class Controleur():
     # Demande au modele de creer une tour a la position cliquee
     def setTour(self, pos_x, pos_y, selectionne):
         return self.modele.partie.creerTour(pos_x, pos_y, selectionne)
+    
+    # Demande au modèle de trouver la tour cliquée à ces coordonnées
+    def clic_tour_existante(self, pos_x, pos_y):
+        tour_cliquee = self.modele.partie.trouver_tour(pos_x, pos_y)
+        
+        if tour_cliquee:
+            # L'objet retourné est la véritable instance de Tour (ou TourLaser, etc.)
+            print(f"Succès : Vous avez cliqué sur une tour de type {tour_cliquee.type} !")
+            print(f"Force : {tour_cliquee.force} | Rayon : {tour_cliquee.rayon}")
 
 
 # ====================================================================

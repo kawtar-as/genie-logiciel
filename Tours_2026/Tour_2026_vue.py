@@ -334,6 +334,20 @@ class Vue():
             if self.parent.setTour(x / 5, y / 5, self.type_en_cours):
                 self.canevas.create_image(x, y, image=self.tour_active,
                                           tags=("tour_img",))
+                
+                self.canevas.tag_bind("tour_img", "<Button-1>", self.cliquer_tour)
+
+    def cliquer_tour(self, evt):
+        # "current" est un tag spécial de Tkinter qui cible l'élément sous la souris
+        item_cible = self.canevas.find_withtag("current")[0]
+        
+        # On récupère les coordonnées [x, y] de cette image sur le canevas
+        coords = self.canevas.coords(item_cible)
+        x_canevas = coords[0]
+        y_canevas = coords[1]
+        
+        # On reconvertit les coordonnées pour le Modèle (divisé par 5) et on l'envoie au Contrôleur
+        self.parent.clic_tour_existante(x_canevas / 5, y_canevas / 5)
 
     # ================================================================
     # OUTILS
