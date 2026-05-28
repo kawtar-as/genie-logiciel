@@ -617,7 +617,31 @@ class Vue():
             ).pack(pady=4)
 
         tk.Frame(centre, bg=C["danger"], height=2, width=300).pack(pady=20)
+        self.frame_enregistrer = tk.Frame(centre, bg=C["bg_dark"])
+        self.frame_enregistrer.pack(pady=10)
 
+        tk.Label(
+            self.frame_enregistrer, text="Entre ton nom :",
+            font=("Consolas", 11), fg=C["text_light"], bg=C["bg_dark"]
+        ).pack(pady=5)
+
+        # Champ de saisie du pseudo
+        self.entry_nom = tk.Entry(
+            self.frame_enregistrer, font=("Consolas", 12),
+            bg=C["bg_card"], fg=C["text_light"], insertbackground="white",
+            relief="flat", width=15, justify="center"
+        )
+        self.entry_nom.pack(pady=5, ipady=4)
+        self.entry_nom.focus_set()
+
+        # Bouton Enregistrer
+        # On passe le score calculé à la fonction de sauvegarde du contrôleur
+        self.btn_save = styled_button(
+            self.frame_enregistrer, text=" Enregistrer le Score ",
+            command=lambda: self.parent.sauvegarder_score(self.entry_nom.get(), score),
+            color=C["accent"]
+        )
+        self.btn_save.pack(pady=10)
         styled_button(
             centre, text="  Quitter  ",
             command=self.root.quit,

@@ -676,15 +676,13 @@ class Partie():
             writer.writerow([valeur, self.score])
 
     
-    def sauvegarder_score_csv(self,nom_joueur):
+    def sauvegarder_score_csv(self,nom_joueur,score):
         
         fichier = "scores.csv"
-        score_calcule = (self.nivo * 100) + self.cash
-        
         # Écrit le nom et le score
         with open(fichier, 'a', newline='', encoding='UTF-8') as f:
             writer = csv.writer(f)
-            writer.writerow([nom_joueur, score_calcule])
+            writer.writerow([nom_joueur, score])
         print("✓ Score sauvegardé dans scores.csv")
 
     def verifier_game_over(self):
@@ -692,7 +690,7 @@ class Partie():
         if self.vie <= 0:
             return True, 
         # Condition 2 : Niveau 15 atteint (victoire)
-        if self.nivo >= 2:
+        if self.nivo >= 15:
             return True, 
         
         return False, None

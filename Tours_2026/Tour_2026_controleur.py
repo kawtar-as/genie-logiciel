@@ -74,11 +74,18 @@ class Controleur():
             tour.tirer()
         partie.ajour_projectiles()
         # Fin de partie si la vie tombe a 0
+
         if partie.vie <= 0:
             self.actif = 0
             print("Partie Terminee")
+            self.vue.game_over()
             return
 
+        if partie.nivo >= 15:
+            self.actif = 0
+            print("Partie Terminee - Victoire !")
+            self.vue.game_over()  # <-- Appel aussi ici en cas de victoire
+            return
         # Rafraichissement graphique
         self.vue.afficheCreepTourBombe()
         self.vue.mettre_a_jour_informations()
@@ -156,7 +163,18 @@ class Controleur():
 # ====================================================================
 # POINT D'ENTREE
 # ====================================================================
-
+# ================================================================
+    # SAUVEGARDE DES SCORES (CSV)
+    # ================================================================
+    def sauvegarder_score(self, nom_joueur, score_final):
+        # Sécurité : Si le joueur n'a rien écrit, on lui donne un nom par défaut
+        nom = nom_joueur.strip()
+        if not nom:
+            nom = "JoueurAnonyme"
+            
+        # Nettoyage pour éviter de casser le format CSV (on enlève les virgules)
+        nom = nom.replace(",", "_") 
+        self.modele.partie.sauvegarder_score_csv(nom, score_final)
 if __name__ == '__main__':
     c = Controleur()
     c.vue.root.mainloop()
