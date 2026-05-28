@@ -53,27 +53,35 @@ class Controleur():
     # Boucle principale du jeu : deplace les creeps, fait tirer les tours,
     # met a jour les projectiles et rafraichit l'affichage
     def continuePartie(self):
-        if self.actif:
+        if not self.actif:
+            return
+        partie = self.modele.partie
+        if partie and partie.nivoActif:
             self.modele.partie.nivoActif.bougeCreep()
-
             # Lancement automatique de la prochaine vague si activee
             if self.vague_automatique:
-                if self.modele.partie.vagueTerminee():
+                if partie.vagueTerminee():
                     self.nouvelleVague()
 
         # Les tours tirent et les projectiles avancent
-        for tour in self.modele.partie.tours:
+        for tour in partie.tours:
             tour.tirer()
-        self.modele.partie.ajour_projectiles()
+        partie.ajour_projectiles()
+        # Fin de partie si la vie tombe a 0
+        if partie.vie <= 0:
+            self.actif = 0
+            print("Partie Terminee")
+            return
 
         # Rafraichissement graphique
         self.vue.afficheCreepTourBombe()
-        self.vue.root.after(self.delai, self.continuePartie)
+        if self.actif:
+            self.vue.root.after(self.delai, self.continuePartie)
 
-        # Fin de partie si la vie tombe a 0
-        if self.modele.partie.vie <= 0:
-            self.actif = 0
-            print("Partie Terminee")
+        # # Fin de partie si la vie tombe a 0
+        # if self.modele.partie.vie <= 0:
+        #     self.actif = 0
+        #     print("Partie Terminee")
 
     # Met le jeu en pause ou le reprend
     def pause(self):
@@ -99,7 +107,7 @@ class Controleur():
 
     # Active / desactive le lancement automatique des vagues
     def vagueAutomatique(self):
-        if self.vague_automatique == False:
+        if not self.vague_automatique:
             self.vague_automatique = True
             self.vue.btn_vague_automatique.config(bg="green", text="Auto: ON")
         else:
