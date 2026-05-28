@@ -88,8 +88,9 @@ CONFIG_CREEPS = {
     "creep_fort":   {"vie": 40,  "vitesse": 1, "force": 20},
     "creep_boss":   {"vie": 150, "vitesse": 0.8, "force": 50},
 }
+
 CONFIG_TIRS= {
-    "missile_normal": {"degat": 10,  "vitesse": 2,"rayon":10,"taille": 5},
+    "missile_normal": {"degat": 10,  "vitesse": 3,"rayon":10,"taille": 5},
     "missile_rapide": {"degat": 20,   "vitesse": 4, "rayon":10,"taille": 7},
     "missile_fort"  : {"degat": 70,   "vitesse": 10, "rayon":10,"taille": 15},
 }
@@ -145,22 +146,19 @@ class Tour():
 
     # Cherche le premier creep a portee et le fixe comme focus
     def chercher_cible(self):
-        if not self.parent.nivoActif : 
-            return
+        #if not self.parent.nivoActif : 
+            #return
         for creep in reversed(self.parent.nivoActif.creepsEnCours):
             if creep.creep_vie > 0 and self.creep_a_portee(creep):
                 self.focus = creep
                 return
         self.focus = None
     #Vérifie si la cible actuelle est toujours valide, vivante et à portée.
-    def valider_focus(self):
-        
-        if (self.focus is not None  
-                and self.focus in self.parent.nivoActif.creepsEnCours
-                and self.focus.creep_vie > 0 
-                and self.creep_a_portee(self.focus)):
-            return True
-        return False
+    # def valider_focus(self):
+    #     return (self.focus is not None  
+    #             and self.focus in self.parent.nivoActif.creepsEnCours
+    #             and self.focus.creep_vie > 0 
+    #             and self.creep_a_portee(self.focus))
     # ----------------------------------------------------------------
     # TIR
     # ----------------------------------------------------------------
@@ -170,7 +168,17 @@ class Tour():
         # 1) Decrementer le cooldown
         if self.cooldown > 0:
             self.cooldown -= 1
-        if not self.valider_focus():
+
+        # 2) Verifier que la cible actuelle est toujours valable
+        focus_valide = (
+            self.focus is not None
+            and self.focus in self.parent.nivoActif.creepsEnCours
+            and self.focus.creep_vie > 0
+            and self.creep_a_portee(self.focus)
+        )
+
+        # 3) Si plus de cible valable, en chercher une nouvelle
+        if not focus_valide:
             self.chercher_cible()
         # 2) Verifier que la cible actuelle est toujours valable
         # focus_valide = (
@@ -202,7 +210,6 @@ class Tour():
 class TourLaser(Tour):
     def __init__(self, parent, pos_x, pos_y, type_tour="tour_1"):
         super().__init__(parent, pos_x, pos_y, type_tour)
-    
     def tirer(self):
         super().tirer()
 
@@ -210,7 +217,6 @@ class TourLaser(Tour):
 class TourNormale(Tour):
     def __init__(self, parent, pos_x, pos_y, type_tour="tour_0"):
         super().__init__(parent, pos_x, pos_y, type_tour)  
-
     def tirer(self):
         super().tirer()
 
@@ -249,7 +255,7 @@ class TourClassique(Tour):
       
 class Missile():
 
-    def __init__(self, x, y, taille, type_missile,cible_creep=None):
+    def __init__(self, x, y, taille, type_missile):
         self.x = x
         self.y = y
         config = CONFIG_TIRS.get(type_missile, CONFIG_TIRS["missile_normal"])
@@ -259,37 +265,34 @@ class Missile():
         self.taille = taille
         self.cible_x = 0
         self.cible_y = 0
-        self.cible_creep = cible_creep      
+        self.cible_creep = None      
 
     def bouger_misile(self):
-        # 1) Cible perdue ou morte
+           # 1) Cible perdue (morte) : le missile s'auto-detruit
         if self.cible_creep is None or self.cible_creep.creep_vie <= 0:
             return True
 
-        # 2) Vérifier que la cible est toujours en jeu
+        # 2) Verifier que la cible est toujours dans la partie
         if self.cible_creep not in self.cible_creep.parent.creepsEnCours:
             return True
 
-        # 3) Mise à jour des coordonnées de la cible
+        # 3) Cible toujours valide : mise a jour de sa position
         self.cible_x = self.cible_creep.pos[0]
         self.cible_y = self.cible_creep.pos[1]
-        
-        # Avancer le missile vers la cible
-        angle = Helper.calcAngle(self.x, self.y, self.cible_x, self.cible_y)
-        self.x, self.y = Helper.getAngledPoint(angle, self.vitesse, self.x, self.y)
 
-        # 4) UNIQUE vérification de la collision APRÈS déplacement
-        if self.collision(self.cible_creep):
+        dist = Helper.calcDistance(self.x, self.y, self.cible_x, self.cible_y)
+
+        # Trajet vers la cible
+        if dist > self.vitesse:
+            angle = Helper.calcAngle(self.x, self.y, self.cible_x, self.cible_y)
+            self.x, self.y = Helper.getAngledPoint(angle, self.vitesse, self.x, self.y)
+            return False
+        else:
+            # Impact : infliger les degats
+            self.x, self.y = self.cible_x, self.cible_y
             self.cible_creep.creep_vie -= self.degat
-            if self.cible_creep.creep_vie < 0:
-                self.cible_creep.creep_vie = 0
             return True
 
-        return False
-
-    def collision(self, cible_creep):
-        dist = Helper.calcDistance(self.x, self.y, cible_creep.pos[0], cible_creep.pos[1])
-        return dist <= (self.taille + cible_creep.taille)
             
 
 class MissileNormal(Missile):
@@ -309,7 +312,7 @@ class MissileRapide(Missile):
         self.cible_y = cible_creep.pos[1]
 
 class MissileFort(Missile):
-  
+
     def __init__(self, x, y, cible_creep): 
         super().__init__(x, y, 15, "missile_fort")
         self.cible_creep = cible_creep
@@ -505,7 +508,7 @@ class Partie():
     # ----------------------------------------------------------------
 
     def __init__(self):
-        self.vie = 10
+        self.vie = 100
         self.cash = 250
         self.creepparnivo = 10
         self.creepforce = 5
