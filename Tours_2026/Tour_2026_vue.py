@@ -138,6 +138,25 @@ class Vue():
         # Separateur decoratif
         tk.Frame(centre, bg=C["accent"], height=2, width=300).pack(pady=5)
 
+        # 1. Utiliser styled_button et .pack() dans 'centre' pour éviter le conflit avec grid
+        self.carte_options = styled_button(
+            centre, text="Options de la carte",
+            command=self.afficher_options_carte,
+            color=C["bg_card"]
+        )
+        self.carte_options.pack(pady=10)
+
+        # 2. Styliser le menu déroulant pour coller au thème sombre
+        self.frame_cartes = tk.Menu(
+            self.root, tearoff=0,
+            bg=C["bg_card"], fg=C["text_light"],
+            activebackground=C["accent"], activeforeground=C["text_light"],
+            font=("Consolas", 10)
+        )
+        self.frame_cartes.add_command(label="Carte 1", command=lambda: self.parent.carte_choissie(1))
+        self.frame_cartes.add_command(label="Carte 2", command=lambda: self.parent.carte_choissie(2))
+        self.frame_cartes.add_command(label="Carte 3", command=lambda: self.parent.carte_choissie(3))
+
         # Bouton START
         self.boutton_play = styled_button(
             centre, text="  START GAME  ",
@@ -147,6 +166,14 @@ class Vue():
         self.boutton_play.pack(pady=20, ipadx=10, ipady=6)
 
         return frame_splash
+    
+    def afficher_options_carte(self):
+            x = self.carte_options.winfo_rootx()
+            y = self.carte_options.winfo_rooty()
+            self.frame_cartes.post(x, y)
+    
+    def carte_choissie(self, nbCarte):
+        return nbCarte
 
     # ----------------------------------------------------------------
     # FRAME : FENETRE PRINCIPALE
@@ -325,13 +352,14 @@ class Vue():
             score = p.nivo * 100 + p.cash
             self.label_score.config(text=f"{score}")
 
-    def creer_carte(self):
+    def creer_carte(self, choix_carte):
         self.canevas = tk.Canvas(
             self.frame_principale,
             width=500, height=500,
             bg=C["bg_dark"], highlightthickness=0
         )
         self.canevas.grid(row=1, column=0)
+        nom_image = f"Tours_2026/chemin{choix_carte}.png"
         self.chemin1 = Image.open("Tours_2026/chemin1.png")
         self.resize = self.chemin1.resize((500, 500), Image.Resampling.LANCZOS)
         self.chmin_img = ImageTk.PhotoImage(self.resize)

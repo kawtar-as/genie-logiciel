@@ -23,7 +23,7 @@ import csv
 # Definit les chemins (suite de noeuds) que les creeps doivent suivre.
 class Parcours():
 
-    def __init__(self):
+    def __init__(self, choix_carte=1):
         # Premier parcours simple
         self.noeuds1 = [[0, 10],
                         [50, 10],
@@ -43,7 +43,7 @@ class Parcours():
                         [100, 80]]
 
         # Parcours actif utilise dans la partie
-        self.noeuds = [[0, 0],
+        self.noeuds3 = [[0, 0],
                        [22, 35],
                        [53, 35],
                        [53, 23],
@@ -52,6 +52,14 @@ class Parcours():
                        [33, 55],
                        [33, 77],
                        [100, 77]]
+        
+
+        if choix_carte == 1:
+            self.noeuds = self.noeuds1
+        elif choix_carte == 2:
+            self.noeuds = self.noeuds2
+        else:
+            self.noeuds = self.noeuds3
 
 
 # ====================================================================
@@ -507,7 +515,7 @@ class Partie():
     # INITIALISATION
     # ----------------------------------------------------------------
 
-    def __init__(self):
+    def __init__(self, choix_carte):
         self.vie = 100
         self.cash = 250
         self.creepparnivo = 10
@@ -519,6 +527,8 @@ class Partie():
         self.price = 0
 
         self.tourActuelle = 0
+        ## chemin
+        self.carteActive = choix_carte
 
     # Initialise un nouveau niveau / vague
     def initPartie(self):
@@ -665,9 +675,8 @@ class Modele():
         self.partie = None
 
     # Demarre une nouvelle partie et initialise son premier niveau
-    def demarrePartie(self):
-
-        self.partie = Partie()
+    def demarrePartie(self, choix_carte):
+        self.partie = Partie(choix_carte)
         self.partie.initPartie()
 
 

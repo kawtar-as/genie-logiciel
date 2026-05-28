@@ -29,10 +29,15 @@ class Controleur():
         self.actif = 0
         self.delai = 50              # Vitesse du jeu (ms entre chaque tick)
         self.vague_automatique = False
+        self.carte_select = 1
 
     # ================================================================
     # CYCLE DE VIE DE LA PARTIE
     # ================================================================
+
+    ## gestion carte
+    def carte_choissie(self, nbCarte):
+        self.carte_select = nbCarte
 
     # Demarre une nouvelle partie : prepare la vue principale et lance la boucle
     def demarrePartie(self):
@@ -41,9 +46,10 @@ class Controleur():
 
         if self.actif == 0:
             self.actif = 1
-            self.modele.demarrePartie()
-            self.vue.creer_carte()
+            self.modele.demarrePartie(self.carte_select)
+            self.vue.creer_carte(self.carte_select)
             self.vue.creer_boite_menu()
+            self.vue.mettre_a_jour_informations()
             self.vue.afficheModele()
             self.vue.afficherCasesVides()
             self.continuePartie()
