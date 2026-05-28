@@ -383,6 +383,14 @@ class Vue():
                 lambda event, x=i[0]*2, y=i[1]*2: self.creerTour(event, x, y)
             )
 
+    # Couleur de corps par type de creep
+    COULEUR_CREEP = {
+        "creep_normal": "#E74C3C",   # rouge
+        "creep_rapide": "#3498DB",   # bleu
+        "creep_fort":   "#E67E22",   # orange
+        "creep_boss":   "#9B59B6",   # violet
+    }
+
     def afficheCreepTourBombe(self):
         self.canevas.delete("creep")
         self.canevas.delete("missile")
@@ -391,27 +399,37 @@ class Vue():
         for creep in self.parent.modele.partie.nivoActif.creepsEnCours:
             cx = creep.pos[0] * 5
             cy = creep.pos[1] * 5
-            r = 5  # rayon du creep
+            r  = creep.taille      # rayon depuis le modele
 
-            # Corps du creep
+            # Corps du creep (couleur selon type)
+            couleur = self.COULEUR_CREEP.get(creep.type_creep, C["danger"])
             self.canevas.create_oval(
                 cx - r, cy - r, cx + r, cy + r,
-                fill=C["danger"], outline="#ff6666", width=1,
+                fill=couleur, outline="white", width=1,
                 tags=("creep",)
             )
 
-            # Barre de vie (fond gris + couleur selon hp)
-            vie_max = creep.creep_vie  # approximation : on utilise la valeur courante comme reference
-            # Calcul de la largeur de barre (fixe sur 14px)
-            barre_w = 14
-            barre_h = 2
+            # Barre de vie (fond gris + couleur proportionnelle aux PV)
+            barre_w = r * 3
+            barre_h = 3
             bx = cx - barre_w // 2
-            by = cy - r - 4
-
-            # Fond de barre (gris)
+            by = cy - r - 5
+            ratio = max(0, creep.creep_vie / creep.vie_max)
+            if ratio > 0.5:
+                couleur_barre = C["hp_high"]
+            elif ratio > 0.25:
+                couleur_barre = C["hp_mid"]
+            else:
+                couleur_barre = C["hp_low"]
+            # Fond gris
             self.canevas.create_rectangle(
                 bx, by, bx + barre_w, by + barre_h,
                 fill="#444", outline="", tags=("creep",)
+            )
+            # Barre pleine
+            self.canevas.create_rectangle(
+                bx, by, bx + int(barre_w * ratio), by + barre_h,
+                fill=couleur_barre, outline="", tags=("creep",)
             )
 
         # --- Missiles colores selon le type ---

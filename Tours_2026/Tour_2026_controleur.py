@@ -81,6 +81,7 @@ class Controleur():
 
         # Rafraichissement graphique
         self.vue.afficheCreepTourBombe()
+        self.vue.mettre_a_jour_informations()
         if self.actif:
             self.vue.root.after(self.delai, self.continuePartie)
 
