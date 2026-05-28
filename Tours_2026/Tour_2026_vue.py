@@ -199,25 +199,25 @@ class Vue():
 
         # Labels d'info avec icones
         self.label_vie = tk.Label(
-            self.frame_infomations, text="--",
+            self.frame_infomations, text="vie :",
             fg=C["danger"], bg=C["bg_panel"], font=("Consolas", 12, "bold")
         )
         self.label_vie.grid(row=0, column=0, pady=12, padx=16)
 
         self.label_argent = tk.Label(
-            self.frame_infomations, text="--",
+            self.frame_infomations, text="cash :",
             fg=C["accent3"], bg=C["bg_panel"], font=("Consolas", 12, "bold")
         )
         self.label_argent.grid(row=0, column=1, pady=12, padx=16)
 
         self.label_score = tk.Label(
-            self.frame_infomations, text="  0",
+            self.frame_infomations, text="score :",
             fg=C["accent2"], bg=C["bg_panel"], font=("Consolas", 12, "bold")
         )
         self.label_score.grid(row=0, column=2, pady=12, padx=16)
 
         self.label_niveau = tk.Label(
-            self.frame_infomations, text="--",
+            self.frame_infomations, text=" niveau :",
             fg=C["accent"], bg=C["bg_panel"], font=("Consolas", 12, "bold")
         )
         self.label_niveau.grid(row=0, column=3, pady=12, padx=16)
@@ -343,11 +343,11 @@ class Vue():
     def mettre_a_jour_informations(self):
         if self.parent.modele.partie:
             p = self.parent.modele.partie
-            self.label_vie.config(text=f"{p.vie}")
-            self.label_argent.config(text=f"{p.cash}")
-            self.label_niveau.config(text=f"{p.nivo}")
+            self.label_vie.config(text=f"vie: {p.vie}")
+            self.label_argent.config(text=f"cash: {p.cash}")
+            self.label_niveau.config(text=f"niveau: {p.nivo}")
             score = p.nivo * 100 + p.cash
-            self.label_score.config(text=f"{score}")
+            self.label_score.config(text=f"score: {score}")
 
     def creer_carte(self, choix_carte):
         self.canevas = tk.Canvas(
