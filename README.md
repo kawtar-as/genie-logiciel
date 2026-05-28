@@ -13,4 +13,5 @@
 - Le joueur peut appuyer sur option et faire pause / résumer 
 - le joueur peut réinitialiser la partie mais le bouton ne fonctionne pas bien car les tours ne s'enlèvent pas
 
-
+## Game over
+- Le joueur peut sauvegarder la partie en mettant son nom, sinon le nom sera anonyme par défaut
