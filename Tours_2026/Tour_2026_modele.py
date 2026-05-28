@@ -82,11 +82,13 @@ CONFIG_TOURS = {
     "tour_5": {"prix": 175, "force": 7, "rayon": 30,  "vitesse": 10,"type_missile":"missile_fort"},
 } 
 # pour les creep
+# reward = argent donne au joueur quand ce creep est tue
+# taille  = rayon visuel en pixels (utilise par la vue)
 CONFIG_CREEPS = {
-    "creep_normal": {"vie": 10,  "vitesse": 2, "force": 10},
-    "creep_rapide": {"vie": 6,   "vitesse": 4, "force": 5},
-    "creep_fort":   {"vie": 40,  "vitesse": 1, "force": 20},
-    "creep_boss":   {"vie": 150, "vitesse": 0.8, "force": 50},
+    "creep_normal": {"vie": 10,  "vitesse": 2,   "force": 10, "reward": 10,  "taille": 5},
+    "creep_rapide": {"vie": 6,   "vitesse": 2.5,   "force": 5,  "reward": 15,  "taille": 4},
+    "creep_fort":   {"vie": 40,  "vitesse": 1,   "force": 20, "reward": 25,  "taille": 8},
+    "creep_boss":   {"vie": 150, "vitesse": 0.8, "force": 50, "reward": 60,  "taille": 12},
 }
 
 CONFIG_TIRS= {
@@ -327,19 +329,21 @@ class MissileFort(Missile):
 # ====================================================================
 # Ennemi qui parcourt le chemin pour atteindre la base du joueur.
 class Creep():
-    def __init__(self, parent,type_creep="creep_normal"):
+    def __init__(self, parent, type_creep="creep_normal"):
         self.parent = parent
         self.pos = self.parent.parcours.noeuds[0][:]
         self.cible = 1               # Indice du prochain noeud a atteindre
-        self.vitesse = 2
-        self.force = 50
-        self.creep_vie = 10
         self.axe = 0
-        self.taille =10
         config = CONFIG_CREEPS[type_creep]
-        self.vitesse = config["vitesse"]
-        self.force = config["force"]
-        self.creep_vie = config["vie"]
+        self.type_creep = type_creep            # utilise par la vue pour la couleur
+        # Recuperer le multiplicateur de difficulte depuis Partie (grand-parent de Creep)
+        diff = getattr(self.parent.parent, "difficulte", 1.0)
+        self.vitesse    = config["vitesse"]                     # vitesse fixe (pas scalee)
+        self.force      = config["force"]
+        self.creep_vie  = int(config["vie"]  * diff)
+        self.vie_max    = self.creep_vie                        # reference fixe pour la barre de vie
+        self.taille     = config["taille"]                      # rayon visuel
+        self.reward     = config["reward"]                      # argent donne au joueur au kill
 
         # Determination de l'axe et de la direction initiale de deplacement
         if self.pos[0] != self.parent.parcours.noeuds[1][0]:
@@ -442,13 +446,35 @@ class Nivo():
         print(s)
         return s
 
-    # Cree tous les creeps de la vague
+    # Cree tous les creeps de la vague selon la composition du niveau
     def creeCreep(self):
-        liste_creep = [CreepNormal, CreepRapide, CreepFort, CreepBoss]
-        for i in range(self.parent.creepparnivo):
-            # a regler est ce que on veut random ou on choisi
-            classeChoisie = liste_creep[0] # par defaut c esst normal
-            self.creeps[self.creerId()] = classeChoisie(self)
+        composition = self._composition_vague()
+        for classe in composition:
+            self.creeps[self.creerId()] = classe(self)
+
+    # Retourne la liste ordonnee des classes de creeps pour ce niveau.
+    # Plus le niveau est eleve, plus il y a de creeps forts et rapides.
+    def _composition_vague(self):
+        nivo = self.parent.nivo
+        total = self.parent.creepparnivo
+        liste = []
+        # Boss : 1 par vague a partir du niveau 5, 2 a partir du niveau 10
+        nb_boss = 0
+        if nivo >= 10:
+            nb_boss = 2
+        elif nivo >= 5:
+            nb_boss = 1
+        # Forts : 1/4 du total a partir du niveau 3
+        nb_forts = max(0, (total // 4) if nivo >= 3 else 0)
+        # Rapides : 1/4 du total a partir du niveau 2
+        nb_rapides = max(0, (total // 4) if nivo >= 2 else 0)
+        # Normaux : le reste
+        nb_normaux = max(0, total - nb_boss - nb_forts - nb_rapides)
+        liste  = [CreepNormal]  * nb_normaux
+        liste += [CreepRapide]  * nb_rapides
+        liste += [CreepFort]    * nb_forts
+        liste += [CreepBoss]    * nb_boss
+        return liste
 
     # ----------------------------------------------------------------
     # GESTION DU MOUVEMENT EN VAGUE
@@ -484,7 +510,7 @@ class Nivo():
             i.bouge()
             if i.creep_vie <= 0:
                 self.creepsEnCours.remove(i)
-                self.parent.cash += 25
+                self.parent.cash += i.reward
             if i.cible >= len(self.parcours.noeuds):
                 self.creepsEnCours.remove(i)
 
@@ -520,9 +546,15 @@ class Partie():
 
         self.tourActuelle = 0
 
-    # Initialise un nouveau niveau / vague
+    # Initialise un nouveau niveau / vague.
+    # Chaque niveau augmente le nombre de creeps (+2 par niveau)
+    # et scale leurs stats via un multiplicateur.
     def initPartie(self):
-        self.nivo = self.nivo + 1
+        self.nivo += 1
+        # +2 creeps par niveau (ex: nivo 1 -> 10, nivo 5 -> 18)
+        self.creepparnivo = 8 + self.nivo * 2
+        # Multiplicateur de stats : +15 % par niveau
+        self.difficulte = 1.0 + (self.nivo - 1) * 0.15
         self.nivoActif = Nivo(self)
 
     # Genere un identifiant unique (pour les emplacements de cases)
