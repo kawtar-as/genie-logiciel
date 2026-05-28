@@ -434,7 +434,7 @@ class Nivo():
 
     def __init__(self, parent):
         self.parent = parent
-        self.parcours = Parcours()
+        self.parcours = Parcours(self.parent.carteActive)
         self.emplacement = Emplacement()
         self.densiteCreep = 3
         self.creeps = {}             # Creeps en attente
@@ -705,7 +705,7 @@ class Modele():
         self.partie = None
 
     # Demarre une nouvelle partie et initialise son premier niveau
-    def demarrePartie(self, choix_carte):
+    def demarrePartie(self, choix_carte = 1):
         self.partie = Partie(choix_carte)
         self.partie.initPartie()
 

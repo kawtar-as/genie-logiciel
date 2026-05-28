@@ -92,11 +92,6 @@ class Controleur():
         if self.actif:
             self.vue.root.after(self.delai, self.continuePartie)
 
-        # # Fin de partie si la vie tombe a 0
-        # if self.modele.partie.vie <= 0:
-        #     self.actif = 0
-        #     print("Partie Terminee")
-
     # Met le jeu en pause ou le reprend
     def pause(self):
         if self.actif == 0:

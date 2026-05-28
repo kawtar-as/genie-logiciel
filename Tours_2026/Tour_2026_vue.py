@@ -171,9 +171,6 @@ class Vue():
             x = self.carte_options.winfo_rootx()
             y = self.carte_options.winfo_rooty()
             self.frame_cartes.post(x, y)
-    
-    def carte_choissie(self, nbCarte):
-        return nbCarte
 
     # ----------------------------------------------------------------
     # FRAME : FENETRE PRINCIPALE
